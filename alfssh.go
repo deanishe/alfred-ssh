@@ -110,8 +110,6 @@ func run() {
 
 	if query != "" {
 		log.Printf("%d hosts match '%s'.", len(hosts), query)
-		flist := workflow.NewFilterList(hosts, GetHostSearchText)
-		log.Printf("flist=%v", flist)
 	}
 
 	// Send results to Alfred -----------------------------------------
