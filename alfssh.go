@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"sort"
 
 	"github.com/docopt/docopt-go"
 	"gogs.deanishe.net/deanishe/awgo"
@@ -14,16 +13,20 @@ const (
 )
 
 var (
-	usage = `alfssh [<query>]
+	usage = `alfssh [options] [<query>]
 
 Display a list of know SSH hosts in Alfred. If <query>
 is specified, the hostnames will be filtered against it.
 
 Usage:
 	alfssh [<query>]
-	alfssh -h|--version
+	alfssh --datadir
+	alfssh --cachedir
+	alfssh --help|--version
 
 Options:
+	--datadir   Print path to workflow's data directory and exit.
+	--cachedir  Print path to workflow's cache directory and exit.
 	-h, --help  Show this message and exit.
 	--version   Show version information and exit.
 `
@@ -41,28 +44,28 @@ type Host struct {
 }
 
 // GetURL returns the ssh:// URL for the host.
-func (h *Host) GetURL() string {
+func (h Host) GetURL() string {
 	url := fmt.Sprintf("ssh://%s", h.Hostname)
 	return url
 }
-
-func GetHostSearchText(h *Host) string {
+func (h Host) Keywords() string {
 	return h.Hostname
 }
 
-type Hosts []Host
+// Hosts is a sortable list of Hosts
+// type Hosts []*Host
 
-func (s Hosts) Len() int {
-	return len(s)
-}
+// func (s Hosts) Len() int {
+// 	return len(s)
+// }
 
-func (s Hosts) Less(i, j int) bool {
-	return s[i].Hostname < s[j].Hostname
-}
+// func (s Hosts) Less(i, j int) bool {
+// 	return s[i].Hostname < s[j].Hostname
+// }
 
-func (s Hosts) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
+// func (s Hosts) Swap(i, j int) {
+// 	s[i], s[j] = s[j], s[i]
+// }
 
 // loadHosts returns a sequence of hostnames.
 func loadHosts() []Host {
@@ -76,16 +79,18 @@ func loadHosts() []Host {
 		"cheese.momama.net",
 		"vla.deanjackson.de",
 	}
-	hosts := make(Hosts, len(hostnames))
+	hosts := make([]Host, len(hostnames))
 	for i, hostname := range hostnames {
 		hosts[i] = Host{hostname, 22, "hardcoded"}
 	}
-	sort.Sort(hosts)
+	// sort.Sort(hosts)
 	return hosts
 }
 
 // run executes the workflow.
 func run() {
+	var query string
+	var hosts []Host
 	// Parse options --------------------------------------------------
 	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.GetName(), Version,
 		workflow.Version)
@@ -96,20 +101,43 @@ func run() {
 	}
 	log.Printf("args=%v", args)
 
-	query := args["<query>"]
-	// Alfred will pass an empty string, so normalise value for shell
-	// and Alfred.
-	if query == nil {
+	// ===================== Alternate actions ========================
+	if args["--datadir"] == true {
+		fmt.Println(workflow.GetDataDir())
+		return
+	}
+
+	if args["--cachedir"] == true {
+		fmt.Println(workflow.GetCacheDir())
+		return
+	}
+
+	// ====================== Script Filter ===========================
+	if args["<query>"] == nil {
 		query = ""
+	} else {
+		query = fmt.Sprintf("%v", args["<query>"])
 	}
 	log.Printf("query=%v", query)
 
 	// Load and filter hosts ------------------------------------------
-	hosts := loadHosts()
+	hosts = loadHosts()
 	log.Printf("%d known hosts.", len(hosts))
 
 	if query != "" {
-		log.Printf("%d hosts match '%s'.", len(hosts), query)
+		// TODO: Filter hosts
+		s := make([]workflow.Filterable, len(hosts))
+		for i, h := range hosts {
+			s[i] = h
+		}
+		// Cast to []Filterable
+		matches := workflow.Filter(query, s, 0.0)
+		log.Printf("%d/%d hosts match '%s'.", len(matches), len(matches), query)
+		var h Host
+		for i, f := range matches {
+			h, _ = f.(Host)
+			log.Printf("%3d  %s", i+1, h.Hostname)
+		}
 	}
 
 	// Send results to Alfred -----------------------------------------
