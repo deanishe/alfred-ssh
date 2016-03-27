@@ -90,12 +90,17 @@ type Host struct {
 }
 
 // GetURL returns the ssh:// URL for the host.
-func (h Host) GetURL() string {
-	var url string
-	if h.Port == 22 {
-		url = fmt.Sprintf("ssh://%s", h.Hostname)
+func (h Host) GetURL(username string) string {
+	var url, prefix string
+	if username != "" {
+		prefix = fmt.Sprintf("ssh://%s@", username)
 	} else {
-		url = fmt.Sprintf("ssh://[%s]:%d", h.Hostname, h.Port)
+		prefix = "ssh://"
+	}
+	if h.Port == 22 {
+		url = fmt.Sprintf("%s%s", prefix, h.Hostname)
+	} else {
+		url = fmt.Sprintf("%s[%s]:%d", prefix, h.Hostname, h.Port)
 	}
 	return url
 }
@@ -287,30 +292,39 @@ func loadTestHosts() Hosts {
 // loadHosts loads hosts from all sources. Duplicates are removed.
 func loadHosts() Hosts {
 	var hosts Hosts
+	seen := make(map[string]bool, 10)
 
 	// ~/.ssh/known_hosts
 	for _, h := range readKnownHosts() {
-		hosts = append(hosts, h)
+		url := h.GetURL("")
+		if _, dupe := seen[url]; !dupe {
+			hosts = append(hosts, h)
+			seen[url] = true
+		}
 	}
 
 	// /etc/hosts
 	for _, h := range readEtcHosts() {
-		hosts = append(hosts, h)
+		url := h.GetURL("")
+		if _, dupe := seen[url]; !dupe {
+			hosts = append(hosts, h)
+			seen[url] = true
+		}
 	}
 
 	// Remove duplicates
 	// log.Printf("%d hosts before dupe check.", len(hosts))
-	var key string
-	m := map[string]bool{}
-	for _, h := range hosts {
-		key = fmt.Sprintf("%s:%d", h.Hostname, h.Port)
-		if _, dupe := m[key]; !dupe {
-			hosts[len(m)] = h
-			m[key] = true
-		}
-	}
-	log.Printf("Removed %d duplicate hosts.", len(hosts)-len(m))
-	hosts = hosts[:len(m)]
+	// var key string
+	// m := map[string]bool{}
+	// for _, h := range hosts {
+	// 	key = fmt.Sprintf("%s:%d", h.Hostname, h.Port)
+	// 	if _, dupe := m[key]; !dupe {
+	// 		hosts[len(m)] = h
+	// 		m[key] = true
+	// 	}
+	// }
+	// log.Printf("Removed %d duplicate hosts.", len(hosts)-len(m))
+	// hosts = hosts[:len(m)]
 
 	// sort.Sort(hosts)
 	return hosts
@@ -322,7 +336,7 @@ func loadHosts() Hosts {
 
 // run executes the workflow.
 func run() {
-	var query string
+	var query, username string
 	var hosts Hosts
 
 	// Parse options --------------------------------------------------
@@ -355,10 +369,18 @@ func run() {
 	}
 
 	// ====================== Script Filter ===========================
+
+	// Parse query ----------------------------------------------------
 	if args["<query>"] == nil {
 		query = ""
 	} else {
 		query = fmt.Sprintf("%v", args["<query>"])
+	}
+
+	// Extract username if there is one
+	if i := strings.Index(query, "@"); i > -1 {
+		username, query = query[:i], query[i+1:]
+		log.Printf("username=%v", username)
 	}
 	log.Printf("query=%v", query)
 
@@ -368,6 +390,12 @@ func run() {
 	} else {
 		hosts = loadHosts()
 	}
+
+	// Add Host for query if it makes sense
+	if query != "" {
+		hosts = append(hosts, Host{query, 22, "user input"})
+	}
+
 	totalHosts := len(hosts)
 	log.Printf("Loaded %d hosts.", totalHosts)
 
@@ -396,12 +424,20 @@ func run() {
 	}
 
 	// Alfred feedback
-	var url, subtitle string
+	var title, subtitle, url string
 	for _, host := range hosts {
-		url = host.GetURL()
+		// Prefix title with username@ to match URL
+		if username != "" {
+			title = fmt.Sprintf("%s@%s", username, host.Hostname)
+		} else {
+			title = host.Hostname
+		}
+		url = host.GetURL(username)
 		subtitle = fmt.Sprintf("%s (from %s)", url, host.Source)
+
+		// Create and configure feedback item
 		it := workflow.NewItem()
-		it.Title = host.Hostname
+		it.Title = title
 		it.Subtitle = subtitle
 		it.UID = fmt.Sprintf("%s:%d", host.Hostname, host.Port)
 		it.Arg = url
