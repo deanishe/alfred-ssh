@@ -50,7 +50,12 @@
 				<key>runningsubtext</key>
 				<string>Reading history…</string>
 				<key>script</key>
-				<string>./alfssh "{query}"</string>
+				<string>./alfssh "{query}"
+
+#export GOPATH=$HOME/Code/Go
+#export GOROOT=$(/usr/local/bin/go env GOROOT)
+#/usr/local/bin/go run ./alfssh.go "{query}"
+</string>
 				<key>title</key>
 				<string>Open SSH Connection</string>
 				<key>type</key>
