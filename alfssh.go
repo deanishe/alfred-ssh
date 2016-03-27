@@ -42,28 +42,40 @@ Display a list of know SSH hosts in Alfred. If <query>
 is specified, the hostnames will be filtered against it.
 
 Usage:
-	alfssh [<query>]
+	alfssh [-t] [<query>]
 	alfssh --datadir
 	alfssh --cachedir
+	alfssh --distname
 	alfssh --help|--version
 
 Options:
+	-t, --test  Use fake test data instead of real data from the computer.
+				Useful for testing, otherwise pointless.
 	--datadir   Print path to workflow's data directory and exit.
 	--cachedir  Print path to workflow's cache directory and exit.
+	--distname  Print filename of distributable .alfredworkflow file (for
+				the build script).
 	-h, --help  Show this message and exit.
 	--version   Show version information and exit.
 `
-)
 
-var (
-	knownHostsPath string
-	etcHostsPath   string
-)
-
-func init() {
-	etcHostsPath = "/etc/hosts"
+	// knownHostsPath string
 	knownHostsPath = os.ExpandEnv("$HOME/.ssh/known_hosts")
-}
+	etcHostsPath   = "/etc/hosts"
+	// Useful for screenshots
+	testHostnames = []string{
+		"one.example.com",
+		"two.example.com",
+		"alpha.deanishe.net",
+		"beta.deanishe.net",
+		"charlie.deanishe.net",
+		"delta.deanishe.net",
+		"imap.example.com",
+		"mail.example.com",
+		"www.example.com",
+		"ftp.example.com",
+	}
+)
 
 // --------------------------------------------------------------------
 // Data models
@@ -158,7 +170,7 @@ func parseKnownHostsLine(line string) []Host {
 			port = p
 			hostname = hostname[1:i]
 		}
-		hosts = append(hosts, Host{hostname, port, "known hosts"})
+		hosts = append(hosts, Host{hostname, port, "~/.ssh/known_hosts"})
 	}
 	return hosts
 }
@@ -263,6 +275,15 @@ func readEtcHosts() []Host {
 	return hosts
 }
 
+// loadTestHosts loads fake test data instead of real hosts.
+func loadTestHosts() Hosts {
+	hosts := make(Hosts, len(testHostnames))
+	for i, name := range testHostnames {
+		hosts[i] = Host{name, 22, "test data"}
+	}
+	return hosts
+}
+
 // loadHosts loads hosts from all sources. Duplicates are removed.
 func loadHosts() Hosts {
 	var hosts Hosts
@@ -303,6 +324,7 @@ func loadHosts() Hosts {
 func run() {
 	var query string
 	var hosts Hosts
+
 	// Parse options --------------------------------------------------
 	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.GetName(), Version,
 		workflow.Version)
@@ -324,6 +346,14 @@ func run() {
 		return
 	}
 
+	if args["--distname"] == true {
+		name := strings.Replace(
+			fmt.Sprintf("%s-%s.alfredworkflow", workflow.GetName(), Version),
+			" ", "-", -1)
+		fmt.Println(name)
+		return
+	}
+
 	// ====================== Script Filter ===========================
 	if args["<query>"] == nil {
 		query = ""
@@ -333,7 +363,11 @@ func run() {
 	log.Printf("query=%v", query)
 
 	// Load hosts -----------------------------------------------------
-	hosts = loadHosts()
+	if args["--test"] == true {
+		hosts = loadTestHosts()
+	} else {
+		hosts = loadHosts()
+	}
 	totalHosts := len(hosts)
 	log.Printf("Loaded %d hosts.", totalHosts)
 
@@ -365,10 +399,11 @@ func run() {
 	var url, subtitle string
 	for _, host := range hosts {
 		url = host.GetURL()
-		subtitle = fmt.Sprintf("%s (%s)", url, host.Source)
+		subtitle = fmt.Sprintf("%s (from %s)", url, host.Source)
 		it := workflow.NewItem()
 		it.Title = host.Hostname
 		it.Subtitle = subtitle
+		it.UID = fmt.Sprintf("%s:%d", host.Hostname, host.Port)
 		it.Arg = url
 		it.SetValid(true)
 		it.SetIcon("icon.png", "")
