@@ -202,44 +202,6 @@ func readKnownHosts() []Host {
 	return hosts
 }
 
-// The next few functions are copied from the source of net/parse.go.
-// Count occurrences in s of any bytes in t.
-func countAnyByte(s string, t string) int {
-	n := 0
-	for i := 0; i < len(s); i++ {
-		if strings.IndexByte(t, s[i]) >= 0 {
-			n++
-		}
-	}
-	return n
-}
-
-// Split s at any bytes in t.
-func splitAtBytes(s string, t string) []string {
-	a := make([]string, 1+countAnyByte(s, t))
-	n := 0
-	last := 0
-	for i := 0; i < len(s); i++ {
-		if strings.IndexByte(t, s[i]) >= 0 {
-			if last < i {
-				a[n] = string(s[last:i])
-				n++
-			}
-			last = i + 1
-		}
-	}
-	if last < len(s) {
-		a[n] = string(s[last:])
-		n++
-	}
-	return a[0:n]
-}
-
-// Split s on whitespace.
-func getFields(s string) []string {
-	return splitAtBytes(s, " \r\t\n")
-}
-
 // readEtcHosts reads hostnames from /etc/hosts.
 func readEtcHosts() []Host {
 	var hosts []Host
@@ -263,7 +225,7 @@ func readEtcHosts() []Host {
 			continue
 		}
 		// Parse fields
-		fields := getFields(line)
+		fields := strings.Fields(line)
 		if len(fields) < 2 {
 			continue
 		}
@@ -439,6 +401,7 @@ func run() {
 		it := workflow.NewItem()
 		it.Title = title
 		it.Subtitle = subtitle
+		it.Autocomplete = title
 		it.UID = fmt.Sprintf("%s:%d", host.Hostname, host.Port)
 		it.Arg = url
 		it.SetValid(true)
