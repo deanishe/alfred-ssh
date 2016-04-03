@@ -289,7 +289,7 @@ func run() {
 	var hosts Hosts
 
 	// Parse options --------------------------------------------------
-	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.GetName(), Version,
+	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.Name(), Version,
 		workflow.Version)
 
 	args, err := docopt.Parse(usage, nil, true, vstr, false)
@@ -300,18 +300,18 @@ func run() {
 
 	// ===================== Alternate actions ========================
 	if args["--datadir"] == true {
-		fmt.Println(workflow.GetDataDir())
+		fmt.Println(workflow.DataDir())
 		return
 	}
 
 	if args["--cachedir"] == true {
-		fmt.Println(workflow.GetCacheDir())
+		fmt.Println(workflow.CacheDir())
 		return
 	}
 
 	if args["--distname"] == true {
 		name := strings.Replace(
-			fmt.Sprintf("%s-%s.alfredworkflow", workflow.GetName(), Version),
+			fmt.Sprintf("%s-%s.alfredworkflow", workflow.Name(), Version),
 			" ", "-", -1)
 		fmt.Println(name)
 		return
@@ -373,11 +373,7 @@ func run() {
 	// Send results to Alfred -----------------------------------------
 	// Show warning if no matches found
 	if len(hosts) == 0 {
-		it := workflow.NewItem()
-		it.Title = "No matching hosts found"
-		it.Subtitle = "Try another query"
-		it.Icon = workflow.ICON_WARNING
-		workflow.SendFeedback()
+		workflow.SendWarning("No matching hosts found", "Try another query")
 		return
 	}
 
