@@ -32,7 +32,7 @@ import (
 )
 
 const (
-	Version = "0.1"
+	Version = "0.1.1"
 )
 
 var (
@@ -43,20 +43,18 @@ is specified, the hostnames will be filtered against it.
 
 Usage:
 	alfssh [-t] [<query>]
-	alfssh --datadir
-	alfssh --cachedir
-	alfssh --distname
 	alfssh --help|--version
+	alfssh --datadir|--cachedir|--distname
 
 Options:
-	-t, --test  Use fake test data instead of real data from the computer.
-				Useful for testing, otherwise pointless.
 	--datadir   Print path to workflow's data directory and exit.
 	--cachedir  Print path to workflow's cache directory and exit.
-	--distname  Print filename of distributable .alfredworkflow file (for
-				the build script).
 	-h, --help  Show this message and exit.
 	--version   Show version information and exit.
+	-t, --test  Use fake test data instead of real data from the computer.
+				Useful for testing, otherwise pointless.
+	--distname  Print filename of distributable .alfredworkflow file (for
+				the build script).
 `
 
 	// knownHostsPath string
@@ -70,6 +68,9 @@ Options:
 		"beta.deanishe.net",
 		"charlie.deanishe.net",
 		"delta.deanishe.net",
+		"echo.deanishe.net",
+		"foxtrot.deanishe.net",
+		"golf.deanishe.net",
 		"imap.example.com",
 		"mail.example.com",
 		"www.example.com",
@@ -105,8 +106,8 @@ func (h Host) GetURL(username string) string {
 	return url
 }
 
-// Hosts is a collection of Host objects that supports sort.Interface and
-// workflow.Fuzzy
+// Hosts is a collection of Host objects that supports workflow.Fuzzy
+// (and therefore sort.Interface).
 type Hosts []Host
 
 // Len implements sort.Interface.
@@ -274,20 +275,6 @@ func loadHosts() Hosts {
 		}
 	}
 
-	// Remove duplicates
-	// log.Printf("%d hosts before dupe check.", len(hosts))
-	// var key string
-	// m := map[string]bool{}
-	// for _, h := range hosts {
-	// 	key = fmt.Sprintf("%s:%d", h.Hostname, h.Port)
-	// 	if _, dupe := m[key]; !dupe {
-	// 		hosts[len(m)] = h
-	// 		m[key] = true
-	// 	}
-	// }
-	// log.Printf("Removed %d duplicate hosts.", len(hosts)-len(m))
-	// hosts = hosts[:len(m)]
-
 	// sort.Sort(hosts)
 	return hosts
 }
@@ -404,7 +391,7 @@ func run() {
 		it.Autocomplete = title
 		it.UID = fmt.Sprintf("%s:%d", host.Hostname, host.Port)
 		it.Arg = url
-		it.SetValid(true)
+		it.Valid = true
 		it.SetIcon("icon.png", "")
 	}
 	workflow.SendFeedback()
@@ -412,6 +399,6 @@ func run() {
 
 // main calls run() via workflow.Run().
 func main() {
-	workflow.GetDefaultWorkflow().Version = Version
+	workflow.DefaultWorkflow().Version = Version
 	workflow.Run(run)
 }
