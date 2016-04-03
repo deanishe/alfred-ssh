@@ -342,11 +342,21 @@ func run() {
 
 	// Add Host for query if it makes sense
 	if query != "" {
-		hosts = append(hosts, Host{query, 22, "user input"})
+		qhost := Host{query, 22, "user input"}
+		dupe := false
+		for _, h := range hosts {
+			if h.GetURL(username) == qhost.GetURL(username) {
+				dupe = true
+				break
+			}
+		}
+		if !dupe {
+			hosts = append(hosts, qhost)
+		}
 	}
 
 	totalHosts := len(hosts)
-	log.Printf("Loaded %d hosts.", totalHosts)
+	log.Printf("%d hosts found.", totalHosts)
 
 	// Filter hosts ---------------------------------------------------
 	if query != "" {
@@ -362,7 +372,6 @@ func run() {
 
 	// Send results to Alfred -----------------------------------------
 	// Show warning if no matches found
-	// TODO: Allow ad-hoc entry of hosts
 	if len(hosts) == 0 {
 		it := workflow.NewItem()
 		it.Title = "No matching hosts found"
