@@ -44,11 +44,12 @@ is specified, the hostnames will be filtered against it.
 Usage:
 	alfssh [-t] [<query>]
 	alfssh --help|--version
-	alfssh --datadir|--cachedir|--distname
+	alfssh --datadir|--cachedir|--distname|--logfile
 
 Options:
 	--datadir   Print path to workflow's data directory and exit.
 	--cachedir  Print path to workflow's cache directory and exit.
+	--logfile   Print path to workflow's logfile and exit.
 	-h, --help  Show this message and exit.
 	--version   Show version information and exit.
 	-t, --test  Use fake test data instead of real data from the computer.
@@ -309,6 +310,11 @@ func run() {
 		return
 	}
 
+	if args["--logfile"] == true {
+		fmt.Println(workflow.LogFile())
+		return
+	}
+
 	if args["--distname"] == true {
 		name := strings.Replace(
 			fmt.Sprintf("%s-%s.alfredworkflow", workflow.Name(), Version),
@@ -340,21 +346,6 @@ func run() {
 		hosts = loadHosts()
 	}
 
-	// Add Host for query if it makes sense
-	if query != "" {
-		qhost := Host{query, 22, "user input"}
-		dupe := false
-		for _, h := range hosts {
-			if h.GetURL(username) == qhost.GetURL(username) {
-				dupe = true
-				break
-			}
-		}
-		if !dupe {
-			hosts = append(hosts, qhost)
-		}
-	}
-
 	totalHosts := len(hosts)
 	log.Printf("%d hosts found.", totalHosts)
 
@@ -368,6 +359,21 @@ func run() {
 			}
 		}
 		log.Printf("%d/%d hosts match `%s`.", len(hosts), totalHosts, query)
+	}
+
+	// Add Host for query if it makes sense
+	if query != "" {
+		qhost := Host{query, 22, "user input"}
+		dupe := false
+		for _, h := range hosts {
+			if h.GetURL(username) == qhost.GetURL(username) {
+				dupe = true
+				break
+			}
+		}
+		if !dupe {
+			hosts = append(hosts, qhost)
+		}
 	}
 
 	// Send results to Alfred -----------------------------------------
