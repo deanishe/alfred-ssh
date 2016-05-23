@@ -17,6 +17,8 @@
 				<integer>0</integer>
 				<key>modifiersubtext</key>
 				<string></string>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 	</dict>
@@ -33,6 +35,8 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
@@ -52,6 +56,12 @@
 				<key>script</key>
 				<string>./alfssh "{query}"
 </string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
 				<key>title</key>
 				<string>Open SSH Connection</string>
 				<key>type</key>
@@ -64,13 +74,15 @@
 			<key>uid</key>
 			<string>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</string>
 			<key>version</key>
-			<integer>0</integer>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>plusspaces</key>
-				<false/>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
 				<key>url</key>
 				<string>{query}</string>
 				<key>utf8</key>
@@ -81,24 +93,42 @@
 			<key>uid</key>
 			<string>83976B20-A05A-4429-8698-363973CC1793</string>
 			<key>version</key>
-			<integer>0</integer>
+			<integer>1</integer>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string></string>
+	<string>Secure SHell
+============
+
+Rapidly open SSH connections, with suggestions from /etc/hosts and known_hosts.</string>
 	<key>uidata</key>
 	<dict>
 		<key>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</key>
 		<dict>
+			<key>xpos</key>
+			<integer>40</integer>
 			<key>ypos</key>
-			<real>10</real>
+			<integer>40</integer>
 		</dict>
 		<key>83976B20-A05A-4429-8698-363973CC1793</key>
 		<dict>
+			<key>xpos</key>
+			<integer>240</integer>
 			<key>ypos</key>
-			<real>10</real>
+			<integer>40</integer>
 		</dict>
 	</dict>
+	<key>variables</key>
+	<dict>
+		<key>DEMO_MODE</key>
+		<string>1</string>
+	</dict>
+	<key>variablesdontexport</key>
+	<array>
+		<string>DEMO_MODE</string>
+	</array>
+	<key>version</key>
+	<string>0.2.0</string>
 	<key>webaddress</key>
 	<string>http://www.deanishe.net</string>
 </dict>

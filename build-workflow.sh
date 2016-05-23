@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 here="$( cd "$( dirname "$0" )"; pwd )"
 
@@ -8,6 +8,22 @@ log() {
 }
 
 pushd "$here" &> /dev/null
+
+# Get metadata from info.plist
+# bundleid="$( /usr/libexec/PlistBuddy -c 'Print :bundleid' info.plist )"
+#
+# if test -z "$bundleid"; then
+#     log "No bundle ID found in info.plist"
+#     exit 1
+# fi
+#
+# name="$( /usr/libexec/PlistBuddy -c 'Print :name' info.plist )"
+#
+# if test -z "$name"; then
+#     log "No workflow name found in info.plist"
+#     exit 1
+# fi
+
 
 log "Cleaning ./build ..."
 rm -rvf ./build
@@ -26,7 +42,7 @@ cp -v LICENCE.txt ./build/
 log
 
 log "Building executable(s) ..."
-go build -v -o ./alfssh ./alfssh.go
+go build -v -o ./alfssh
 ST_BUILD=$?
 if [ "$ST_BUILD" != 0 ]; then
     log "Error building executable."
@@ -40,6 +56,10 @@ cp -v ./alfssh ./build/alfssh
 
 # Get the dist filename from the executable
 zipfile="$(./alfssh --distname 2> /dev/null)"
+if [ "$?" -ne 0 ]; then
+    log "Error getting distname from alfssh."
+    exit 1
+fi
 
 log
 
@@ -49,9 +69,13 @@ if test -e "$zipfile"; then
     log
 fi
 
-log "Building .alfredworkflow file ..."
 pushd ./build/ &> /dev/null
-zip "../${zipfile}" *
+
+log "Cleaning info.plist ..."
+/usr/libexec/PlistBuddy -c 'Delete :variables:DEMO_MODE' info.plist
+
+log "Building .alfredworkflow file ..."
+zip "../${zipfile}" ./*
 ST_ZIP=$?
 if [ "$ST_ZIP" != 0 ]; then
     log "Error creating .alfredworkflow file."
@@ -66,5 +90,6 @@ log
 log "Cleaning up ..."
 rm -rvf ./build/
 
+log "Wrote '${zipfile}' in '$( pwd )'"
+
 popd &> /dev/null
-log "All done."

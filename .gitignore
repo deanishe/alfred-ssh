@@ -41,3 +41,5 @@ _testmain.go
 *.test
 *.prof
 
+*.tags
+*tags1

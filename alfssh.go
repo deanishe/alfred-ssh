@@ -10,11 +10,11 @@
 alfssh.go
 =========
 
-A Script Filter for Alfred 2 for opening SSH connections. Auto-suggests
+A Script Filter for Alfred 3 for opening SSH connections. Auto-suggests
 hosts from ~/.ssh/known_hosts and from /etc/hosts.
 
 The script filter is implemented as a command-line program (that outputs
-XML).
+JSON).
 */
 package main
 
@@ -32,51 +32,36 @@ import (
 )
 
 const (
-	Version = "0.1.1"
+// Version is the current version of the workflow
+// Version = "0.2.0"
 )
 
 var (
 	usage = `alfssh [options] [<query>]
 
-Display a list of know SSH hosts in Alfred. If <query>
+Display a list of know SSH hosts in Alfred 3. If <query>
 is specified, the hostnames will be filtered against it.
 
 Usage:
-	alfssh [-t] [<query>]
-	alfssh --help|--version
-	alfssh --datadir|--cachedir|--distname|--logfile
+    alfssh [-t] [<query>]
+    alfssh --help|--version
+    alfssh --datadir|--cachedir|--distname|--logfile
 
 Options:
-	--datadir   Print path to workflow's data directory and exit.
-	--cachedir  Print path to workflow's cache directory and exit.
-	--logfile   Print path to workflow's logfile and exit.
-	-h, --help  Show this message and exit.
-	--version   Show version information and exit.
-	-t, --test  Use fake test data instead of real data from the computer.
-				Useful for testing, otherwise pointless.
-	--distname  Print filename of distributable .alfredworkflow file (for
-				the build script).
+    --datadir   Print path to workflow's data directory and exit.
+    --cachedir  Print path to workflow's cache directory and exit.
+    --logfile   Print path to workflow's logfile and exit.
+    -h, --help  Show this message and exit.
+    --version   Show version information and exit.
+    -d, --demo  Use fake test data instead of real data from the computer.
+                Useful for testing, otherwise pointless.
+    --distname  Print filename of distributable .alfredworkflow file (for
+                the build script).
 `
 
 	// knownHostsPath string
 	knownHostsPath = os.ExpandEnv("$HOME/.ssh/known_hosts")
 	etcHostsPath   = "/etc/hosts"
-	// Useful for screenshots
-	testHostnames = []string{
-		"one.example.com",
-		"two.example.com",
-		"alpha.deanishe.net",
-		"beta.deanishe.net",
-		"charlie.deanishe.net",
-		"delta.deanishe.net",
-		"echo.deanishe.net",
-		"foxtrot.deanishe.net",
-		"golf.deanishe.net",
-		"imap.example.com",
-		"mail.example.com",
-		"www.example.com",
-		"ftp.example.com",
-	}
 )
 
 // --------------------------------------------------------------------
@@ -109,7 +94,7 @@ func (h Host) GetURL(username string) string {
 
 // Hosts is a collection of Host objects that supports workflow.Fuzzy
 // (and therefore sort.Interface).
-type Hosts []Host
+type Hosts []*Host
 
 // Len implements sort.Interface.
 func (s Hosts) Len() int {
@@ -137,8 +122,8 @@ func (s Hosts) Keywords(i int) string {
 
 // parseKnownHostsLine extracts the host(s) from a single line in
 // ~/.ssh/know_hosts.
-func parseKnownHostsLine(line string) []Host {
-	var hosts []Host
+func parseKnownHostsLine(line string) []*Host {
+	var hosts []*Host
 	var hostnames []string
 	// Split line on first whitespace. First element is hostname(s),
 	// second is the key.
@@ -177,14 +162,14 @@ func parseKnownHostsLine(line string) []Host {
 			port = p
 			hostname = hostname[1:i]
 		}
-		hosts = append(hosts, Host{hostname, port, "~/.ssh/known_hosts"})
+		hosts = append(hosts, &Host{hostname, port, "~/.ssh/known_hosts"})
 	}
 	return hosts
 }
 
 // readKnowHosts reads hostnames from ~/.ssh/know_hosts.
-func readKnownHosts() []Host {
-	var hosts []Host
+func readKnownHosts() []*Host {
+	var hosts []*Host
 	fp, err := os.Open(knownHostsPath)
 	if err != nil {
 		log.Printf("Error opening ~/.ssh/known_hosts : %v", err)
@@ -205,8 +190,8 @@ func readKnownHosts() []Host {
 }
 
 // readEtcHosts reads hostnames from /etc/hosts.
-func readEtcHosts() []Host {
-	var hosts []Host
+func readEtcHosts() []*Host {
+	var hosts []*Host
 	// TODO: Parse /etc/hosts
 	fp, err := os.Open(etcHostsPath)
 	if err != nil {
@@ -237,7 +222,7 @@ func readEtcHosts() []Host {
 		}
 		// All other fields are hostnames
 		for _, s := range fields[1:] {
-			hosts = append(hosts, Host{s, 22, "/etc/hosts"})
+			hosts = append(hosts, &Host{s, 22, "/etc/hosts"})
 		}
 	}
 	log.Printf("%d hosts in /etc/hosts.", len(hosts))
@@ -248,7 +233,7 @@ func readEtcHosts() []Host {
 func loadTestHosts() Hosts {
 	hosts := make(Hosts, len(testHostnames))
 	for i, name := range testHostnames {
-		hosts[i] = Host{name, 22, "test data"}
+		hosts[i] = &Host{name, 22, "test data"}
 	}
 	return hosts
 }
@@ -284,40 +269,77 @@ func loadHosts() Hosts {
 // Execute Script Filter
 // --------------------------------------------------------------------
 
-// run executes the workflow.
-func run() {
-	var query, username string
-	var hosts Hosts
+type options struct {
+	printVar string
+
+	useTestData bool
+
+	query    string
+	username string
+}
+
+// runOptions constructs the program options from command-line arguments and
+// environment variables.
+func runOptions() *options {
+	o := &options{}
 
 	// Parse options --------------------------------------------------
-	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.Name(), Version,
-		workflow.Version)
+	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.Name(),
+		workflow.Version(), workflow.LibVersion)
 
 	args, err := docopt.Parse(usage, nil, true, vstr, false)
 	if err != nil {
-		log.Fatalf("Error parsing CLI options : %v", err)
+		panic(fmt.Sprintf("Error parsing CLI options : %v", err))
 	}
-	log.Printf("args=%v", args)
+	// log.Printf("args=%v", args)
+
+	// Alternate Actions
+	if args["--datadir"] == true {
+		o.printVar = "data"
+	} else if args["--cachedir"] == true {
+		o.printVar = "cache"
+	} else if args["--logfile"] == true {
+		o.printVar = "log"
+	} else if args["--distname"] == true {
+		o.printVar = "dist"
+	}
+
+	if args["--demo"] == true || os.Getenv("DEMO_MODE") != "" {
+		o.useTestData = true
+	}
+
+	if args["<query>"] != nil {
+		if s, ok := args["<query>"].(string); ok {
+			o.query = s
+		} else {
+			panic("Can't convert query to string.")
+		}
+	}
+
+	return o
+}
+
+// run executes the workflow.
+func run() {
+
+	var hosts Hosts
+
+	o := runOptions()
+	log.Printf("options=%v", o)
 
 	// ===================== Alternate actions ========================
-	if args["--datadir"] == true {
+	if o.printVar == "data" {
 		fmt.Println(workflow.DataDir())
 		return
-	}
-
-	if args["--cachedir"] == true {
+	} else if o.printVar == "cache" {
 		fmt.Println(workflow.CacheDir())
 		return
-	}
-
-	if args["--logfile"] == true {
+	} else if o.printVar == "log" {
 		fmt.Println(workflow.LogFile())
 		return
-	}
-
-	if args["--distname"] == true {
+	} else if o.printVar == "dist" {
 		name := strings.Replace(
-			fmt.Sprintf("%s-%s.alfredworkflow", workflow.Name(), Version),
+			fmt.Sprintf("%s-%s.alfredworkflow", workflow.Name(), workflow.DefaultWorkflow().Version),
 			" ", "-", -1)
 		fmt.Println(name)
 		return
@@ -326,21 +348,17 @@ func run() {
 	// ====================== Script Filter ===========================
 
 	// Parse query ----------------------------------------------------
-	if args["<query>"] == nil {
-		query = ""
-	} else {
-		query = fmt.Sprintf("%v", args["<query>"])
-	}
 
 	// Extract username if there is one
-	if i := strings.Index(query, "@"); i > -1 {
-		username, query = query[:i], query[i+1:]
-		log.Printf("username=%v", username)
+	if i := strings.Index(o.query, "@"); i > -1 {
+		o.username, o.query = o.query[:i], o.query[i+1:]
+		log.Printf("username=%v", o.username)
 	}
-	log.Printf("query=%v", query)
+	log.Printf("query=%v", o.query)
 
 	// Load hosts -----------------------------------------------------
-	if args["--test"] == true {
+	if o.useTestData {
+		log.Println("**** Using test data ****")
 		hosts = loadTestHosts()
 	} else {
 		hosts = loadHosts()
@@ -350,23 +368,23 @@ func run() {
 	log.Printf("%d hosts found.", totalHosts)
 
 	// Filter hosts ---------------------------------------------------
-	if query != "" {
+	if o.query != "" {
 		// var matches Hosts
-		for i, score := range workflow.SortFuzzy(hosts, query) {
+		for i, score := range workflow.SortFuzzy(hosts, o.query) {
 			if score == 0.0 { // Cutoff
 				hosts = hosts[:i]
 				break
 			}
 		}
-		log.Printf("%d/%d hosts match `%s`.", len(hosts), totalHosts, query)
+		log.Printf("%d/%d hosts match `%s`.", len(hosts), totalHosts, o.query)
 	}
 
 	// Add Host for query if it makes sense
-	if query != "" {
-		qhost := Host{query, 22, "user input"}
+	if o.query != "" {
+		qhost := &Host{o.query, 22, "user input"}
 		dupe := false
 		for _, h := range hosts {
-			if h.GetURL(username) == qhost.GetURL(username) {
+			if h.GetURL(o.username) == qhost.GetURL(o.username) {
 				dupe = true
 				break
 			}
@@ -379,20 +397,23 @@ func run() {
 	// Send results to Alfred -----------------------------------------
 	// Show warning if no matches found
 	if len(hosts) == 0 {
-		workflow.SendWarning("No matching hosts found", "Try another query")
+		workflow.Warn("No matching hosts found", "Try another query")
 		return
 	}
 
 	// Alfred feedback
 	var title, subtitle, url string
+
 	for _, host := range hosts {
+
 		// Prefix title with username@ to match URL
-		if username != "" {
-			title = fmt.Sprintf("%s@%s", username, host.Hostname)
+		if o.username != "" {
+			title = fmt.Sprintf("%s@%s", o.username, host.Hostname)
 		} else {
 			title = host.Hostname
 		}
-		url = host.GetURL(username)
+
+		url = host.GetURL(o.username)
 		subtitle = fmt.Sprintf("%s (from %s)", url, host.Source)
 
 		// Create and configure feedback item
@@ -410,6 +431,6 @@ func run() {
 
 // main calls run() via workflow.Run().
 func main() {
-	workflow.DefaultWorkflow().Version = Version
+	// workflow.DefaultWorkflow().Version = Version
 	workflow.Run(run)
 }
