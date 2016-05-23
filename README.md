@@ -17,6 +17,12 @@ Keyword is `ssh`:
     - `⇥` — Expand query to selected connection's title. Useful for adding a port number.
 
 
+Installation
+------------
+
+Download [the latest release][gh-releases] and double-click the file to install in Alfred.
+
+
 Licence
 -------
 
@@ -29,6 +35,7 @@ The icon is from [Octicons][octicons] by [Github][gh], released under the [SIL L
 [demo]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/demo.gif
 [octicons]: https://octicons.github.com/
 [gh]: https://github.com/
+[gh-releases]: https://github.com/deanishe/alfred-ssh/releases/latest
 [ssh-breathe]: https://github.com/isometry/alfredworkflows/tree/master/net.isometry.alfred.ssh
 [mit]: ./LICENCE.txt
 [sil]: http://scripts.sil.org/OFL
