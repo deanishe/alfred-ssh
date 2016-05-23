@@ -51,7 +51,7 @@ fi
 
 log "Building .alfredworkflow file ..."
 pushd ./build/ &> /dev/null
-zip -v "../${zipfile}" *
+zip "../${zipfile}" *
 ST_ZIP=$?
 if [ "$ST_ZIP" != 0 ]; then
     log "Error creating .alfredworkflow file."
@@ -68,4 +68,3 @@ rm -rvf ./build/
 
 popd &> /dev/null
 log "All done."
-
