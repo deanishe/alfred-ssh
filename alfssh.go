@@ -37,13 +37,15 @@ const (
 )
 
 var (
-	usage = `alfssh [options] [<query>]
+	// MinFuzzyScore is the default cut-off for search results
+	MinFuzzyScore = 30.0
+	usage         = `alfssh [options] [<query>]
 
 Display a list of know SSH hosts in Alfred 3. If <query>
 is specified, the hostnames will be filtered against it.
 
 Usage:
-    alfssh [-t] [<query>]
+    alfssh [-d] [<query>]
     alfssh --help|--version
     alfssh --datadir|--cachedir|--distname|--logfile
 
@@ -325,7 +327,7 @@ func run() {
 	var hosts Hosts
 
 	o := runOptions()
-	log.Printf("options=%v", o)
+	log.Printf("options=%+v", o)
 
 	// ===================== Alternate actions ========================
 	if o.printVar == "data" {
@@ -339,7 +341,7 @@ func run() {
 		return
 	} else if o.printVar == "dist" {
 		name := strings.Replace(
-			fmt.Sprintf("%s-%s.alfredworkflow", workflow.Name(), workflow.DefaultWorkflow().Version),
+			fmt.Sprintf("%s-%s.alfredworkflow", workflow.Name(), workflow.Version()),
 			" ", "-", -1)
 		fmt.Println(name)
 		return
@@ -371,10 +373,11 @@ func run() {
 	if o.query != "" {
 		// var matches Hosts
 		for i, score := range workflow.SortFuzzy(hosts, o.query) {
-			if score == 0.0 { // Cutoff
+			if score <= MinFuzzyScore { // Cutoff
 				hosts = hosts[:i]
 				break
 			}
+			// log.Printf("[%f] %+v", score, hosts[i])
 		}
 		log.Printf("%d/%d hosts match `%s`.", len(hosts), totalHosts, o.query)
 	}
