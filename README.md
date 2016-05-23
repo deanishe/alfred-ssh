@@ -13,7 +13,8 @@ Usage
 Keyword is `ssh`:
 
 - `ssh [<query>]` — View and filter known SSH connections.
-    - `↩ ` — Open the actioned connection.
+    - `↩` or `⌘+<NUM>` — Open the connection.
+    - `⇥` — Expand query to selected connection's title. Useful for adding a port number.
 
 
 Licence
@@ -25,7 +26,7 @@ The icon is from [Octicons][octicons] by [Github][gh], released under the [SIL L
 
 
 [alfredapp]: https://www.alfredapp.com/
-[demo]: ./demo.gif
+[demo]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/demo.gif
 [octicons]: https://octicons.github.com/
 [gh]: https://github.com/
 [ssh-breathe]: https://github.com/isometry/alfredworkflows/tree/master/net.isometry.alfred.ssh
