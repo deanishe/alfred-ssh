@@ -13,8 +13,9 @@ Usage
 Keyword is `ssh`:
 
 - `ssh [<query>]` — View and filter known SSH connections.
-    - `↩` or `⌘+<NUM>` — Open the connection.
-    - `⇥` — Expand query to selected connection's title. Useful for adding a port number.
+
+  - `↩` or `⌘+<NUM>` — Open the connection.
+  - `⇥` — Expand query to selected connection's title. Useful for adding a port number.
 
 
 Installation
