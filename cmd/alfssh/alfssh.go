@@ -41,7 +41,7 @@ is specified, the hostnames will be filtered against it.
 
 Usage:
     alfssh search [-d] [<query>]
-    alfssh remember <url>
+    alfssh (remember|forget) <url>
     alfssh print (datadir|cachedir|distname|logfile)
     alfssh --help|--version
 
@@ -77,7 +77,9 @@ func (s Hosts) Keywords(i int) string { return s[i].Name() }
 
 type options struct {
 	printVar    string // Set to print the corresponding variable
-	query       string // User query
+	query       string // User query. User input is parsed into query and username
+	rawInput    string // The full, unparsed query
+	remember    bool   // Where to remember or forget url
 	url         string // URL to add to history
 	username    string // SSH username. Added later by query parser.
 	useTestData bool   // Whether to load test data instead of user data
@@ -97,7 +99,7 @@ func runOptions() *options {
 	if err != nil {
 		panic(fmt.Sprintf("Error parsing CLI options : %v", err))
 	}
-	log.Printf("args=%v", args)
+	// log.Printf("args=%v", args)
 
 	// Alternate Actions
 	if args["print"] == true {
@@ -110,13 +112,15 @@ func runOptions() *options {
 		} else if args["distname"] == true {
 			o.printVar = "dist"
 		}
-	} else if args["remember"] == true {
+	} else if args["remember"] == true || args["forget"] == true {
 		if s, ok := args["<url>"].(string); ok {
 			o.url = s
 		} else {
 			panic("Can't convert <url> to string.")
 		}
-
+		if args["remember"] == true {
+			o.remember = true
+		}
 	}
 
 	if args["--demo"] == true || os.Getenv("DEMO_MODE") != "" {
@@ -126,6 +130,7 @@ func runOptions() *options {
 	if args["<query>"] != nil {
 		if s, ok := args["<query>"].(string); ok {
 			o.query = s
+			o.rawInput = s
 		} else {
 			panic("Can't convert query to string.")
 		}
@@ -138,14 +143,18 @@ func runOptions() *options {
 func run() {
 
 	var hosts Hosts
+	var host *assh.Host
 	var h *assh.History
-
-	historyPath := filepath.Join(wf.DataDir(), "history.json")
-
-	log.Printf("historyPath=%s", historyPath)
+	var historyPath string
 
 	o := runOptions()
-	log.Printf("options=%+v", o)
+
+	if o.useTestData {
+		historyPath = filepath.Join(wf.DataDir(), "history.test.json")
+	} else {
+		historyPath = filepath.Join(wf.DataDir(), "history.json")
+	}
+	// log.Printf("options=%+v", o)
 
 	// ===================== Alternate actions ========================
 	if o.printVar == "data" {
@@ -172,16 +181,26 @@ func run() {
 
 		return
 
-	} else if o.url != "" { // Add host to history
+	} else if o.url != "" { // Remember or forget URL
 
 		h := assh.NewHistory(historyPath)
 		if err := h.Load(); err != nil {
 			log.Printf("Error loading history : %v", err)
 			panic(err)
 		}
-		if err := h.Add(o.url); err != nil {
-			log.Printf("Error adding URL : %v", err)
-			panic(err)
+
+		if o.remember { // Add URL to history
+
+			if err := h.Add(o.url); err != nil {
+				log.Printf("Error adding URL : %v", err)
+				panic(err)
+			}
+		} else { // Remove URL from history
+			if err := h.Remove(o.url); err != nil {
+				log.Printf("Error removing URL : %v", err)
+				panic(err)
+			}
+			log.Printf("Removed %s from history", o.url)
 		}
 
 		return
@@ -194,24 +213,26 @@ func run() {
 	// Extract username if there is one
 	if i := strings.Index(o.query, "@"); i > -1 {
 		o.username, o.query = o.query[:i], o.query[i+1:]
-		log.Printf("username=%v", o.username)
+		log.Printf("username=%v, query=%v", o.username, o.query)
+	} else {
+		log.Printf("query=%v", o.query)
 	}
-	log.Printf("query=%v", o.query)
 
 	// Load hosts -----------------------------------------------------
+
+	// History
 	h = assh.NewHistory(historyPath)
 	if err := h.Load(); err != nil {
 		log.Printf("Error loading history : %v", err)
-	} else {
-		log.Printf("Loaded %d items from history", len(h.Hosts()))
 	}
+	hosts = h.Hosts()
 
+	// Main dataset
 	if o.useTestData {
 		log.Println("**** Using test data ****")
-		hosts = assh.TestHosts()
+		hosts = append(hosts, assh.TestHosts()...)
 	} else {
-		hosts = append(hosts, h.Hosts()...) // History
-		hosts = assh.Hosts()
+		hosts = append(hosts, assh.Hosts()...)
 	}
 
 	totalHosts := len(hosts)
@@ -225,14 +246,14 @@ func run() {
 				hosts = hosts[:i]
 				break
 			}
-			log.Printf("[%f] %+v", score, hosts[i])
+			// log.Printf("score: %5s %+v", fmt.Sprintf("%0.1f", score), hosts[i])
 		}
 		log.Printf("%d/%d hosts match `%s`", len(hosts), totalHosts, o.query)
 	}
 
 	// Add Host for query if it makes sense
 	if o.query != "" {
-		host := &assh.Host{o.query, 22, "user input", ""}
+		host = &assh.Host{o.query, 22, "user input", ""}
 		hosts = append(hosts, host)
 	}
 
@@ -252,7 +273,7 @@ func run() {
 		if o.username != "" &&
 			host.Username != "" &&
 			o.username != host.Username {
-			log.Printf("Ignoring mismatched username: %+v", host)
+			// log.Printf("Ignoring mismatched username: %+v", host)
 			continue
 		}
 
@@ -271,7 +292,7 @@ func run() {
 
 		urls[url] = true
 
-		// Create and configure feedback item
+		// Feedback item -------------------------------------------------
 		it := wf.NewItem(title)
 		it.Subtitle = subtitle
 		it.Autocomplete = title
@@ -280,14 +301,34 @@ func run() {
 		it.Valid = true
 		it.SetIcon("icon.png", "")
 
-		// Modifiers
-		m, err := workflow.NewModifier("cmd")
-		if err != nil {
-			panic(err)
-		}
+		// Variables -----------------------------------------------------
+		it.SetVar("query", o.rawInput)
+		it.SetVar("host", host.Hostname)
+		it.SetVar("source", host.Source)
+		it.SetVar("url", url)
+
+		// Modifiers -----------------------------------------------------
+
+		// Open SFTP connection instead
+		m, _ := it.NewModifier("cmd")
 		m.SetArg(host.SFTP())
 		m.SetSubtitle(fmt.Sprintf("Open as SFTP connection (%s)", host.SFTP()))
-		it.SetModifier(m)
+
+		// Delete connection from history
+		m, _ = it.NewModifier("alt")
+		if host.Source == "history" {
+			m.SetSubtitle("Delete connection from history")
+			m.SetValid(true)
+			m.SetArg(url)
+		} else {
+			m.SetSubtitle("Connection not from history")
+			m.SetValid(false)
+		}
+
+		// Ping host
+		m, _ = it.NewModifier("shift")
+		m.SetSubtitle(fmt.Sprintf("Ping %s", host.Hostname))
+		m.SetArg(host.Hostname)
 
 	}
 	wf.SendFeedback()

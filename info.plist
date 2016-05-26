@@ -12,6 +12,16 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
+				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
 				<string>83976B20-A05A-4429-8698-363973CC1793</string>
 				<key>modifiers</key>
 				<integer>0</integer>
@@ -22,7 +32,79 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
-				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+				<string>BEDA7962-222B-4001-8A98-6EB2B78342AD</string>
+				<key>modifiers</key>
+				<integer>524288</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<true/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>1A62410B-26D8-493D-B57F-599DC4A36FD1</string>
+				<key>modifiers</key>
+				<integer>131072</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3EA43D53-1646-4640-B369-F8CF936FDBBF</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>BEDA7962-222B-4001-8A98-6EB2B78342AD</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>C246528B-48CD-4C6B-A6AA-5B80BD18802C</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>C246528B-48CD-4C6B-A6AA-5B80BD18802C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>EC55D85A-7A17-4ACF-A406-B9F53CB22425</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>F6FCC74B-9EC0-47A6-8C0D-B445AD7C9722</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -42,6 +124,49 @@
 	<string>Secure SHell</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string># Add URL to History
+./alfssh remember "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>browser</key>
+				<string></string>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.openurl</string>
+			<key>uid</key>
+			<string>83976B20-A05A-4429-8698-363973CC1793</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -89,19 +214,13 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>spaces</key>
-				<string></string>
-				<key>url</key>
-				<string>{query}</string>
-				<key>utf8</key>
-				<true/>
+				<key>triggerid</key>
+				<string>ssh</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
+			<string>alfred.workflow.trigger.external</string>
 			<key>uid</key>
-			<string>83976B20-A05A-4429-8698-363973CC1793</string>
+			<string>F6FCC74B-9EC0-47A6-8C0D-B445AD7C9722</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -113,7 +232,8 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>./alfssh remember "$1"</string>
+				<string># Remove URL from History
+./alfssh forget "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -124,44 +244,230 @@
 			<key>type</key>
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
-			<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+			<string>BEDA7962-222B-4001-8A98-6EB2B78342AD</string>
 			<key>version</key>
 			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>script</key>
+				<string>tell application "Alfred 3" to search "ssh " &amp; (system attribute "query")</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>6</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>EC55D85A-7A17-4ACF-A406-B9F53CB22425</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:EXTERNAL_TRIGGER}</string>
+				<key>matchcasesensitive</key>
+				<true/>
+				<key>matchmode</key>
+				<integer>1</integer>
+				<key>matchstring</key>
+				<string>1</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>C246528B-48CD-4C6B-A6AA-5B80BD18802C</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>ping "{query}"</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.terminalcommand</string>
+			<key>uid</key>
+			<string>1A62410B-26D8-493D-B57F-599DC4A36FD1</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>68</integer>
+				<key>script</key>
+				<string>tell application "Alfred 3" to run trigger "ssh" in workflow "net.deanishe.alfred-ssh" with argument (system attribute "query")</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>6</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>3EA43D53-1646-4640-B369-F8CF936FDBBF</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>inputstring</key>
+				<string>{var:EXTERNAL_TRIGGER}</string>
+				<key>matchcasesensitive</key>
+				<true/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>1</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</string>
+			<key>version</key>
+			<integer>1</integer>
 		</dict>
 	</array>
 	<key>readme</key>
 	<string>Secure SHell
 ============
 
-Rapidly open SSH connections, with suggestions from /etc/hosts and known_hosts.</string>
+Rapidly open SSH/SFTP connections, with suggestions from /etc/hosts and ~/.ssh/known_hosts.
+
+Remembers connections with usernames to make connecting, so you don't have to type your username every time.
+
+
+Settings
+--------
+
+When removing a connection from the History, the workflow re-opens itself with the previous query.
+
+The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the External Trigger instead of calling itself by keyword ("ssh").</string>
 	<key>uidata</key>
 	<dict>
+		<key>1A62410B-26D8-493D-B57F-599DC4A36FD1</key>
+		<dict>
+			<key>note</key>
+			<string>Alternate Action: Ping host</string>
+			<key>xpos</key>
+			<integer>510</integer>
+			<key>ypos</key>
+			<integer>570</integer>
+		</dict>
 		<key>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</key>
 		<dict>
+			<key>note</key>
+			<string>List and filter known SSH connections</string>
 			<key>xpos</key>
-			<integer>40</integer>
+			<integer>210</integer>
 			<key>ypos</key>
-			<integer>40</integer>
+			<integer>230</integer>
+		</dict>
+		<key>3EA43D53-1646-4640-B369-F8CF936FDBBF</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>1</integer>
+			<key>note</key>
+			<string>Re-open Alfred with previous query (External Trigger).
+
+Disabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to enable.</string>
+			<key>xpos</key>
+			<integer>800</integer>
+			<key>ypos</key>
+			<integer>650</integer>
+		</dict>
+		<key>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</key>
+		<dict>
+			<key>note</key>
+			<string>Enable/disable action</string>
+			<key>xpos</key>
+			<integer>710</integer>
+			<key>ypos</key>
+			<integer>680</integer>
 		</dict>
 		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
 		<dict>
+			<key>note</key>
+			<string>Remember connection in History (if there's a username)</string>
 			<key>xpos</key>
-			<integer>240</integer>
+			<integer>510</integer>
 			<key>ypos</key>
-			<integer>170</integer>
+			<integer>50</integer>
 		</dict>
 		<key>83976B20-A05A-4429-8698-363973CC1793</key>
 		<dict>
+			<key>note</key>
+			<string>Open SSH/SFTP URL with default handler</string>
 			<key>xpos</key>
-			<integer>240</integer>
+			<integer>510</integer>
 			<key>ypos</key>
+			<integer>230</integer>
+		</dict>
+		<key>BEDA7962-222B-4001-8A98-6EB2B78342AD</key>
+		<dict>
+			<key>note</key>
+			<string>Alternate Action: Forget connection from History</string>
+			<key>xpos</key>
+			<integer>510</integer>
+			<key>ypos</key>
+			<integer>400</integer>
+		</dict>
+		<key>C246528B-48CD-4C6B-A6AA-5B80BD18802C</key>
+		<dict>
+			<key>note</key>
+			<string>Enable/disable action</string>
+			<key>xpos</key>
+			<integer>710</integer>
+			<key>ypos</key>
+			<integer>430</integer>
+		</dict>
+		<key>EC55D85A-7A17-4ACF-A406-B9F53CB22425</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>5</integer>
+			<key>note</key>
+			<string>Re-open Alfred with previous query (Direct Call).
+
+Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable.</string>
+			<key>xpos</key>
+			<integer>800</integer>
+			<key>ypos</key>
+			<integer>400</integer>
+		</dict>
+		<key>F6FCC74B-9EC0-47A6-8C0D-B445AD7C9722</key>
+		<dict>
+			<key>note</key>
+			<string>Used (optionally) to re-open workflow after deleting a connection from History.</string>
+			<key>xpos</key>
 			<integer>40</integer>
+			<key>ypos</key>
+			<integer>230</integer>
 		</dict>
 	</dict>
 	<key>variables</key>
 	<dict>
-		<key>DEMO_MODE</key>
-		<string></string>
+		<key>EXTERNAL_TRIGGER</key>
+		<string>0</string>
 	</dict>
 	<key>variablesdontexport</key>
 	<array>

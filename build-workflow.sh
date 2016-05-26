@@ -36,7 +36,7 @@ rm -rvf ./build
 
 log
 
-log "Copying assets to ./build ..."
+log "Hardlinking assets to ./build ..."
 
 mkdir -vp ./build
 

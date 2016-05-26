@@ -18,11 +18,8 @@ import (
 	"net"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
-
-	"gogs.deanishe.net/deanishe/awgo"
 )
 
 var (
@@ -49,12 +46,12 @@ Options:
 	// knownHostsPath string
 	knownHostsPath = os.ExpandEnv("$HOME/.ssh/known_hosts")
 	etcHostsPath   = "/etc/hosts"
-	wf             *workflow.Workflow
+	// wf             *workflow.Workflow
 )
 
-func init() {
-	wf = workflow.NewWorkflow(nil)
-}
+// func init() {
+// 	wf = workflow.NewWorkflow(nil)
+// }
 
 // --------------------------------------------------------------------
 // Data models
@@ -124,7 +121,8 @@ func (h *Host) URLForProtocol(proto string) string {
 	if h.Port == 22 {
 		url = fmt.Sprintf("%s%s", prefix, h.Hostname)
 	} else {
-		url = fmt.Sprintf("%s[%s]:%d", prefix, h.Hostname, h.Port)
+		// url = fmt.Sprintf("%s[%s]:%d", prefix, h.Hostname, h.Port)
+		url = fmt.Sprintf("%s%s:%d", prefix, h.Hostname, h.Port)
 	}
 	return url
 }
@@ -150,7 +148,7 @@ func NewHistory(path string) *History {
 func (h *History) Add(URL string) error {
 	for _, host := range h.hosts {
 		if host.URL() == URL {
-			log.Printf("Ignoring duplicate: %s", URL)
+			log.Printf("[History] Ignoring duplicate: %s", URL)
 			return nil
 		}
 	}
@@ -159,15 +157,28 @@ func (h *History) Add(URL string) error {
 		return err
 	}
 	if host.Username == "" {
-		log.Printf("Not saving connection without username: %v", URL)
+		log.Printf("Not adding connection without username to history: %v", URL)
 		return nil
 	}
 	host.Source = "history"
 	h.hosts = append(h.hosts, host)
 
-	log.Printf("Saving %s ...", host.Name())
+	log.Printf("Adding %s to history ...", host.Name())
 
 	return h.Save()
+}
+
+// Remove removes an item from the History.
+func (h *History) Remove(URL string) error {
+	for i, host := range h.hosts {
+		if host.URL() == URL {
+			h.hosts = append(h.hosts[0:i], h.hosts[i+1:]...)
+			log.Printf("Removed %s from history", host.Name())
+			return h.Save()
+		}
+	}
+	log.Printf("Item not in history: %s", URL)
+	return nil
 }
 
 // Hosts returns all the Hosts in History.
@@ -177,7 +188,8 @@ func (h *History) Hosts() []*Host {
 
 // Load loads the history from disk.
 func (h *History) Load() error {
-	if !workflow.PathExists(h.Path) {
+	if _, err := os.Stat(h.Path); err != nil {
+		log.Println("0 hosts in history")
 		return nil
 	}
 
@@ -198,6 +210,7 @@ func (h *History) Load() error {
 			h.hosts = append(h.hosts, host)
 		}
 	}
+	log.Printf("%d host(s) in history", len(h.hosts))
 	return nil
 }
 
@@ -218,7 +231,7 @@ func (h *History) Save() error {
 		return err
 	}
 
-	log.Printf("%d item(s) in history", len(h.hosts))
+	log.Printf("Saved %d host(s) to history", len(h.hosts))
 	return nil
 }
 
@@ -305,7 +318,7 @@ func readKnownHosts() []*Host {
 		}
 	}
 
-	log.Printf("%d hosts in ~/.ssh/known_hosts", len(hosts))
+	log.Printf("%d host(s) in ~/.ssh/known_hosts", len(hosts))
 	return hosts
 }
 
@@ -353,7 +366,7 @@ func readEtcHosts() []*Host {
 		}
 	}
 
-	log.Printf("%d hosts in /etc/hosts", len(hosts))
+	log.Printf("%d host(s) in /etc/hosts", len(hosts))
 	return hosts
 }
 
@@ -385,21 +398,21 @@ func Hosts() []*Host {
 		}
 	}
 
-	// History
-	h := NewHistory(filepath.Join(wf.DataDir(), "history.json"))
-	if err := h.Load(); err != nil {
-		log.Printf("Error loading history: %v", err)
-	} else {
-		for _, h := range h.hosts {
-
-			url := h.URL()
-
-			if _, dupe := seen[url]; !dupe {
-				hosts = append(hosts, h)
-				seen[url] = true
-			}
-		}
-	}
+	// // History
+	// h := NewHistory(filepath.Join(wf.DataDir(), "history.json"))
+	// if err := h.Load(); err != nil {
+	// 	log.Printf("Error loading history: %v", err)
+	// } else {
+	// 	for _, h := range h.hosts {
+	//
+	// 		url := h.URL()
+	//
+	// 		if _, dupe := seen[url]; !dupe {
+	// 			hosts = append(hosts, h)
+	// 			seen[url] = true
+	// 		}
+	// 	}
+	// }
 	// sort.Sort(hosts)
 	return hosts
 }

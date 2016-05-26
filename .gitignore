@@ -1,5 +1,7 @@
 # Keep the generated binary out of the repo
 /alfssh
+# And the file for generating data
+/demo-data.py
 
 # Created by https://www.gitignore.io/api/vim,go
 
