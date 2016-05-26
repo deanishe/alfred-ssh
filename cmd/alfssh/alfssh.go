@@ -280,6 +280,15 @@ func run() {
 		it.Valid = true
 		it.SetIcon("icon.png", "")
 
+		// Modifiers
+		m, err := workflow.NewModifier("cmd")
+		if err != nil {
+			panic(err)
+		}
+		m.SetArg(host.SFTP())
+		m.SetSubtitle(fmt.Sprintf("Open as SFTP connection (%s)", host.SFTP()))
+		it.SetModifier(m)
+
 	}
 	wf.SendFeedback()
 }
