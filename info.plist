@@ -20,6 +20,16 @@
 				<key>vitoclose</key>
 				<false/>
 			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
 		</array>
 	</dict>
 	<key>createdby</key>
@@ -54,7 +64,7 @@
 				<key>runningsubtext</key>
 				<string>Reading history…</string>
 				<key>script</key>
-				<string>./alfssh "$1"
+				<string>./alfssh search "$1"
 </string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -95,6 +105,29 @@
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./alfssh remember "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>Secure SHell
@@ -109,6 +142,13 @@ Rapidly open SSH connections, with suggestions from /etc/hosts and known_hosts.<
 			<integer>40</integer>
 			<key>ypos</key>
 			<integer>40</integer>
+		</dict>
+		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
+		<dict>
+			<key>xpos</key>
+			<integer>240</integer>
+			<key>ypos</key>
+			<integer>170</integer>
 		</dict>
 		<key>83976B20-A05A-4429-8698-363973CC1793</key>
 		<dict>
