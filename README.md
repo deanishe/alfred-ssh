@@ -69,5 +69,5 @@ Changelog
 [gh-releases]: https://github.com/deanishe/alfred-ssh/releases/latest
 [isometry]: https://github.com/isometry
 [ssh-breathe]: https://github.com/isometry/alfredworkflows/tree/master/net.isometry.alfred.ssh
-[mit]: ./LICENCE.txt
+[mit]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/LICENCE.txt
 [sil]: http://scripts.sil.org/OFL
