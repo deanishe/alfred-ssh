@@ -35,6 +35,7 @@ Keyword is `ssh`:
   - `↩` or `⌘+<NUM>` — Open the connection.
   - `⇥` — Expand query to selected connection's title. Useful for adding a port number.
   - `⌘+↩` — Open an SFTP connection instead.
+  - `⇧+↩` — Ping host.
   - `⌥+↩` — Forget connection (if it's from history).
 
 **Please note**: The workflow simply generates an `ssh://` (or `sftp://`) URL and asks Alfred to open it. Similarly, the ping function uses Alfred 3's Terminal Command feature. If it's not opening in the right app, it's not the workflow's fault.
