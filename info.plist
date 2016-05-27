@@ -151,25 +151,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>spaces</key>
-				<string></string>
-				<key>url</key>
-				<string>{query}</string>
-				<key>utf8</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
-			<key>uid</key>
-			<string>83976B20-A05A-4429-8698-363973CC1793</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
 				<key>argumenttype</key>
@@ -227,26 +208,21 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string># Remove URL from History
-./alfssh forget "$1"</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
+				<key>browser</key>
 				<string></string>
-				<key>type</key>
-				<integer>0</integer>
+				<key>spaces</key>
+				<string></string>
+				<key>url</key>
+				<string>{query}</string>
+				<key>utf8</key>
+				<true/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.action.openurl</string>
 			<key>uid</key>
-			<string>BEDA7962-222B-4001-8A98-6EB2B78342AD</string>
+			<string>83976B20-A05A-4429-8698-363973CC1793</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -268,6 +244,30 @@
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>EC55D85A-7A17-4ACF-A406-B9F53CB22425</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string># Remove URL from History
+./alfssh forget "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>BEDA7962-222B-4001-8A98-6EB2B78342AD</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -359,6 +359,14 @@ Remembers connections with usernames to make connecting, so you don't have to ty
 
 Settings
 --------
+
+The workflow reads hosts from three sources:
+
+- /etc/hosts
+- ~/.ssh/known_hosts
+- Its own history
+
+You can disable any source by setting its corresponding Workflow Environment Variable to 1, so set DISABLE_ETC_HOSTS=1 to ignore /etc/hosts.
 
 When removing a connection from the History, the workflow re-opens itself with the previous query.
 
@@ -466,15 +474,17 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 	</dict>
 	<key>variables</key>
 	<dict>
+		<key>DISABLE_ETC_HOSTS</key>
+		<string>0</string>
+		<key>DISABLE_HISTORY</key>
+		<string>0</string>
+		<key>DISABLE_KNOWN_HOSTS</key>
+		<string>0</string>
 		<key>EXTERNAL_TRIGGER</key>
 		<string>0</string>
 	</dict>
-	<key>variablesdontexport</key>
-	<array>
-		<string>DEMO_MODE</string>
-	</array>
 	<key>version</key>
-	<string>0.3.0</string>
+	<string>0.4.0</string>
 	<key>webaddress</key>
 	<string>http://www.deanishe.net</string>
 </dict>

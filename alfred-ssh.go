@@ -23,39 +23,71 @@ import (
 )
 
 var (
-	// minFuzzyScore is the default cut-off for search results
-	minFuzzyScore = 30.0
-	usage         = `alfssh [options] [<query>]
-
-Display a list of know SSH hosts in Alfred 3. If <query>
-is specified, the hostnames will be filtered against it.
-
-Usage:
-    alfssh search [-d] [<query>]
-    alfssh remember <url>
-    alfssh print (datadir|cachedir|distname|logfile)
-    alfssh --help|--version
-
-Options:
-    -h, --help        Show this message and exit.
-    --version         Show version information and exit.
-    -d, --demo        Use fake test data instead of real data from the computer.
-                      Useful for testing, otherwise pointless. Demo mode can also
-                      turned on by setting the environment variable DEMO_MODE=1
-`
-	// knownHostsPath string
 	knownHostsPath = os.ExpandEnv("$HOME/.ssh/known_hosts")
 	etcHostsPath   = "/etc/hosts"
-	// wf             *workflow.Workflow
+	// Providers contains all registered providers of Hosts
+	Providers map[string]Provider
+	// disabled contains the names of disabled providers
+	disabled map[string]bool
 )
 
-// func init() {
-// 	wf = workflow.NewWorkflow(nil)
-// }
+func init() {
+	Providers = make(map[string]Provider, 2)
+	disabled = map[string]bool{}
+	Register(&providerWrapper{name: "/etc/hosts", fn: readEtcHosts})
+	Register(&providerWrapper{name: "known_hosts", fn: readKnownHosts})
+}
 
 // --------------------------------------------------------------------
 // Data models
 // --------------------------------------------------------------------
+
+// Provider is a provider of Hosts.
+type Provider interface {
+	Name() string
+	Hosts() []*Host
+}
+
+// Disable disables a Provider.
+func Disable(name string) {
+	if p := Providers[name]; p != nil {
+		disabled[name] = true
+	} else {
+		log.Printf("Unknown provider: %s", name)
+	}
+}
+
+// Disabled returns true if a Provider is disabled.
+func Disabled(name string) bool {
+	return disabled[name]
+}
+
+// Register registers a Provider.
+func Register(p Provider) {
+	Providers[p.Name()] = p
+}
+
+type providerWrapper struct {
+	name   string
+	fn     func() []*Host
+	hosts  []*Host
+	called bool
+}
+
+// Name implements Provider.
+func (pw *providerWrapper) Name() string {
+	return pw.name
+}
+
+// Hosts implements Provider.
+func (pw *providerWrapper) Hosts() []*Host {
+	if pw.called {
+		return pw.hosts
+	}
+	pw.hosts = pw.fn()
+	pw.called = true
+	return pw.hosts
+}
 
 // Host is computer that may be connected to.
 type Host struct {
@@ -160,7 +192,7 @@ func (h *History) Add(URL string) error {
 		log.Printf("Not adding connection without username to history: %v", URL)
 		return nil
 	}
-	host.Source = "history"
+	host.Source = h.Name()
 	h.hosts = append(h.hosts, host)
 
 	log.Printf("Adding %s to history ...", host.Name())
@@ -184,6 +216,11 @@ func (h *History) Remove(URL string) error {
 // Hosts returns all the Hosts in History.
 func (h *History) Hosts() []*Host {
 	return h.hosts
+}
+
+// Name implements Provider.
+func (h *History) Name() string {
+	return "history"
 }
 
 // Load loads the history from disk.
@@ -210,7 +247,7 @@ func (h *History) Load() error {
 			h.hosts = append(h.hosts, host)
 		}
 	}
-	log.Printf("%d host(s) in history", len(h.hosts))
+	// log.Printf("%d host(s) in history", len(h.hosts))
 	return nil
 }
 
@@ -233,6 +270,17 @@ func (h *History) Save() error {
 
 	log.Printf("Saved %d host(s) to history", len(h.hosts))
 	return nil
+}
+
+// RegisterHistory is a convenience method to create and register a History.
+func RegisterHistory(path string) (*History, error) {
+	h := NewHistory(path)
+	if err := h.Load(); err != nil {
+		return nil, err
+	}
+	Register(h)
+
+	return h, nil
 }
 
 // --------------------------------------------------------------------
@@ -318,7 +366,7 @@ func readKnownHosts() []*Host {
 		}
 	}
 
-	log.Printf("%d host(s) in ~/.ssh/known_hosts", len(hosts))
+	// log.Printf("%d host(s) in ~/.ssh/known_hosts", len(hosts))
 	return hosts
 }
 
@@ -366,53 +414,38 @@ func readEtcHosts() []*Host {
 		}
 	}
 
-	log.Printf("%d host(s) in /etc/hosts", len(hosts))
+	// log.Printf("%d host(s) in /etc/hosts", len(hosts))
 	return hosts
 }
 
-// Hosts loads hosts from all sources. Duplicates are removed.
+// Hosts loads Hosts from active providers. Duplicates are removed.
 func Hosts() []*Host {
 	hosts := []*Host{}
-
 	seen := make(map[string]bool, 10)
 
-	// ~/.ssh/known_hosts
-	for _, h := range readKnownHosts() {
-
-		url := h.URL()
-
-		if _, dupe := seen[url]; !dupe {
-			hosts = append(hosts, h)
-			seen[url] = true
+	for n, p := range Providers {
+		if Disabled(n) {
+			log.Printf("Ignoring disabled provider '%s'", n)
+			continue
 		}
+
+		i := 0
+		j := 0
+		for _, h := range p.Hosts() {
+
+			u := h.URL()
+
+			if _, dupe := seen[u]; !dupe {
+				hosts = append(hosts, h)
+				seen[u] = true
+				i++
+			} else {
+				j++
+			}
+
+		}
+		log.Printf("Loaded %d host(s) from '%s', ignored %d dupe(s)", i, n, j)
 	}
 
-	// /etc/hosts
-	for _, h := range readEtcHosts() {
-
-		url := h.URL()
-
-		if _, dupe := seen[url]; !dupe {
-			hosts = append(hosts, h)
-			seen[url] = true
-		}
-	}
-
-	// // History
-	// h := NewHistory(filepath.Join(wf.DataDir(), "history.json"))
-	// if err := h.Load(); err != nil {
-	// 	log.Printf("Error loading history: %v", err)
-	// } else {
-	// 	for _, h := range h.hosts {
-	//
-	// 		url := h.URL()
-	//
-	// 		if _, dupe := seen[url]; !dupe {
-	// 			hosts = append(hosts, h)
-	// 			seen[url] = true
-	// 		}
-	// 	}
-	// }
-	// sort.Sort(hosts)
 	return hosts
 }

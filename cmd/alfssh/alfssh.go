@@ -93,7 +93,7 @@ func runOptions() *options {
 
 	// Parse options --------------------------------------------------
 	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.Name(),
-		workflow.Version(), workflow.LibVersion)
+		workflow.Version(), workflow.AwgoVersion)
 
 	args, err := docopt.Parse(usage, nil, true, vstr, false)
 	if err != nil {
@@ -144,7 +144,7 @@ func run() {
 
 	var hosts Hosts
 	var host *assh.Host
-	var h *assh.History
+	// var h *assh.History
 	var historyPath string
 
 	o := runOptions()
@@ -182,6 +182,11 @@ func run() {
 		return
 
 	} else if o.url != "" { // Remember or forget URL
+
+		if os.Getenv("DISABLE_HISTORY") == "1" {
+			log.Println("History disabled. Ignoring.")
+			return
+		}
 
 		h := assh.NewHistory(historyPath)
 		if err := h.Load(); err != nil {
@@ -221,11 +226,21 @@ func run() {
 	// Load hosts -----------------------------------------------------
 
 	// History
-	h = assh.NewHistory(historyPath)
-	if err := h.Load(); err != nil {
+	_, err := assh.RegisterHistory(historyPath)
+	if err != nil {
 		log.Printf("Error loading history : %v", err)
 	}
-	hosts = h.Hosts()
+
+	// Disable sources user doesn't want
+	if os.Getenv("DISABLE_HISTORY") == "1" {
+		assh.Disable("history")
+	}
+	if os.Getenv("DISABLE_ETC_HOSTS") == "1" {
+		assh.Disable("/etc/hosts")
+	}
+	if os.Getenv("DISABLE_KNOWN_HOSTS") == "1" {
+		assh.Disable("known_hosts")
+	}
 
 	// Main dataset
 	if o.useTestData {
@@ -310,12 +325,12 @@ func run() {
 		// Modifiers -----------------------------------------------------
 
 		// Open SFTP connection instead
-		m, _ := it.NewModifier("cmd")
+		m := it.NewModifier("cmd")
 		m.SetArg(host.SFTP())
 		m.SetSubtitle(fmt.Sprintf("Open as SFTP connection (%s)", host.SFTP()))
 
 		// Delete connection from history
-		m, _ = it.NewModifier("alt")
+		m = it.NewModifier("alt")
 		if host.Source == "history" {
 			m.SetSubtitle("Delete connection from history")
 			m.SetValid(true)
@@ -326,7 +341,7 @@ func run() {
 		}
 
 		// Ping host
-		m, _ = it.NewModifier("shift")
+		m = it.NewModifier("shift")
 		m.SetSubtitle(fmt.Sprintf("Ping %s", host.Hostname))
 		m.SetArg(host.Hostname)
 
