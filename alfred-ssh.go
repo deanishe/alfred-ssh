@@ -18,6 +18,7 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -279,13 +280,24 @@ func RegisterHistory(path string) (*History, error) {
 		return nil, err
 	}
 	Register(h)
-
 	return h, nil
 }
 
 // --------------------------------------------------------------------
 // Load data
 // --------------------------------------------------------------------
+
+var (
+	hostnameRegex = regexp.MustCompile("^[a-zA-Z0-9.-]+$")
+)
+
+// validHostname returns true if n is an IP address or hostname.
+func validHostname(n string) bool {
+	if ip := net.ParseIP(n); ip != nil {
+		return true
+	}
+	return hostnameRegex.MatchString(n)
+}
 
 // parseKnownHostsLine extracts the host(s) from a single line in
 // ~/.ssh/know_hosts.
@@ -303,14 +315,7 @@ func parseKnownHostsLine(line string) []*Host {
 	line = line[:i]
 
 	// Split hostname on comma. Some entries are of format hostname,ip.
-	i = strings.Index(line, ",")
-
-	if i > -1 {
-		hostnames = append(hostnames, strings.TrimSpace(line[0:i]))
-		hostnames = append(hostnames, strings.TrimSpace(line[i+1:]))
-	} else {
-		hostnames = append(hostnames, strings.TrimSpace(line))
-	}
+	hostnames = append(hostnames, strings.Split(line, ",")...)
 
 	// Parse the found hostnames to see if any specify a non-default
 	// port. Such entries look like [host.name.here]:NNNN instead of
@@ -339,7 +344,12 @@ func parseKnownHostsLine(line string) []*Host {
 			hostname = hostname[1:i]
 		}
 
-		hosts = append(hosts, &Host{hostname, port, "~/.ssh/known_hosts", ""})
+		if !validHostname(hostname) {
+			log.Printf("Invalid hostname: %s", hostname)
+			continue
+		}
+
+		hosts = append(hosts, &Host{Hostname: hostname, Port: port})
 	}
 
 	return hosts
@@ -362,6 +372,7 @@ func readKnownHosts() []*Host {
 	for scanner.Scan() {
 		line := scanner.Text()
 		for _, host := range parseKnownHostsLine(line) {
+			host.Source = "~/.ssh/known_hosts"
 			hosts = append(hosts, host)
 		}
 	}

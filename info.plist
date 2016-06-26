@@ -484,7 +484,7 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 		<string>0</string>
 	</dict>
 	<key>version</key>
-	<string>0.4.0</string>
+	<string>0.4.1</string>
 	<key>webaddress</key>
 	<string>http://www.deanishe.net</string>
 </dict>
