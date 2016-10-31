@@ -46,7 +46,7 @@ func TestHosts() []*Host {
 	hosts := make([]*Host, len(testHostnames))
 
 	for i, name := range testHostnames {
-		hosts[i] = &Host{name, 22, "test data", ""}
+		hosts[i] = &Host{name, name, 22, "test data", ""}
 	}
 
 	return hosts

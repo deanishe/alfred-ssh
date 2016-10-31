@@ -25,16 +25,16 @@ import (
 	"path/filepath"
 	"strings"
 
+	"strconv"
+
 	"github.com/docopt/docopt-go"
 	"gogs.deanishe.net/deanishe/alfred-ssh"
 	"gogs.deanishe.net/deanishe/awgo"
-	"gogs.deanishe.net/deanishe/awgo/fuzzy"
 )
 
 var (
-	// minFuzzyScore is the default cut-off for search results
-	minFuzzyScore = 30.0
-	usage         = `alfssh [options] [<query>]
+	minScore = 30.0 // Default cut-off for search results
+	usage    = `alfssh [options] [<query>]
 
 Display a list of know SSH hosts in Alfred 3. If <query>
 is specified, the hostnames will be filtered against it.
@@ -52,14 +52,21 @@ Options:
                       Useful for testing, otherwise pointless. Demo mode can also
                       turned on by setting the environment variable DEMO_MODE=1
 `
-	wf *workflow.Workflow
+	wfopts *aw.Options
+	sopts  *aw.SortOptions
+	wf     *aw.Workflow
 )
 
 func init() {
-	wf = workflow.NewWorkflow(nil)
+	sopts = aw.NewSortOptions()
+	sopts.SeparatorBonus = 10.0
+	wfopts = &aw.Options{
+		SortOptions: sopts,
+	}
+	wf = aw.NewWorkflow(nil)
 }
 
-// Hosts is a collection of Host objects that supports workflow.Fuzzy
+// Hosts is a collection of Host objects that supports aw.Sortable.
 // (and therefore sort.Interface).
 type Hosts []*assh.Host
 
@@ -68,14 +75,15 @@ func (s Hosts) Len() int           { return len(s) }
 func (s Hosts) Less(i, j int) bool { return s[i].Hostname < s[j].Hostname }
 func (s Hosts) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
 
-// Keywords implements workflow.Fuzzy.
-func (s Hosts) Keywords(i int) string { return s[i].Name() }
+// SortKey implements aw.Sortable.
+func (s Hosts) SortKey(i int) string { return s[i].Name }
 
 // --------------------------------------------------------------------
 // Execute Script Filter
 // --------------------------------------------------------------------
 
 type options struct {
+	port        int    // SSH port. Added later by query parser.
 	printVar    string // Set to print the corresponding variable
 	query       string // User query. User input is parsed into query and username
 	rawInput    string // The full, unparsed query
@@ -92,8 +100,8 @@ func runOptions() *options {
 	o := &options{}
 
 	// Parse options --------------------------------------------------
-	vstr := fmt.Sprintf("%s/%v (awgo/%v)", workflow.Name(),
-		workflow.Version(), workflow.AwgoVersion)
+	vstr := fmt.Sprintf("%s/%v (awgo/%v)", wf.Name(),
+		wf.Version(), aw.AwgoVersion)
 
 	args, err := docopt.Parse(usage, nil, true, vstr, false)
 	if err != nil {
@@ -218,10 +226,16 @@ func run() {
 	// Extract username if there is one
 	if i := strings.Index(o.query, "@"); i > -1 {
 		o.username, o.query = o.query[:i], o.query[i+1:]
-		log.Printf("username=%v, query=%v", o.username, o.query)
-	} else {
-		log.Printf("query=%v", o.query)
 	}
+	if i := strings.Index(o.query, ":"); i > -1 {
+		var port string
+		o.query, port = o.query[:i], o.query[i+1:]
+		if v, err := strconv.Atoi(port); err == nil {
+			o.port = v
+		}
+	}
+
+	log.Printf("query=%v, username=%v, port=%v", o.query, o.username, o.port)
 
 	// Load hosts -----------------------------------------------------
 
@@ -241,6 +255,12 @@ func run() {
 	if os.Getenv("DISABLE_KNOWN_HOSTS") == "1" {
 		assh.Disable("known_hosts")
 	}
+	if os.Getenv("DISABLE_CONFIG") == "1" {
+		assh.Disable("config")
+	}
+	if os.Getenv("DISABLE_ETC_CONFIG") == "1" {
+		assh.Disable("/etc/config")
+	}
 
 	// Main dataset
 	if o.useTestData {
@@ -253,22 +273,15 @@ func run() {
 	totalHosts := len(hosts)
 	log.Printf("%d hosts found", totalHosts)
 
-	// Filter hosts ---------------------------------------------------
-	if o.query != "" {
-		// q := strings.TrimSpace(fmt.Sprintf("%s %s", o.username, o.query))
-		for i, score := range fuzzy.Sort(hosts, o.query) {
-			if score <= minFuzzyScore { // Cutoff
-				hosts = hosts[:i]
-				break
-			}
-			// log.Printf("score: %5s %+v", fmt.Sprintf("%0.1f", score), hosts[i])
-		}
-		log.Printf("%d/%d hosts match `%s`", len(hosts), totalHosts, o.query)
-	}
-
 	// Add Host for query if it makes sense
 	if o.query != "" {
-		host = &assh.Host{o.query, 22, "user input", ""}
+		host = &assh.Host{
+			Name:     o.rawInput,
+			Hostname: o.query,
+			Port:     22,
+			Source:   "user input",
+			Username: o.username,
+		}
 		hosts = append(hosts, host)
 	}
 
@@ -280,11 +293,17 @@ func run() {
 	}
 
 	// Alfred feedback
-	var title, subtitle, url string
+	var cmd, comp, key, title, subtitle, uid, url string
+	var exitOnSuccess bool
 
-	urls := map[string]bool{}
+	if os.Getenv("EXIT_ON_SUCCESS") == "1" {
+		exitOnSuccess = true
+	}
+
+	seen := map[string]bool{}
 	for _, host := range hosts {
 
+		// Ignore hosts with usernames that don't match user's input
 		if o.username != "" &&
 			host.Username != "" &&
 			o.username != host.Username {
@@ -292,60 +311,98 @@ func run() {
 			continue
 		}
 
+		title = host.Name
+		comp = host.Name // Autocomplete
+		key = host.Name  // Sort key
+
 		if o.username != "" && host.Username == "" {
 			host.Username = o.username
+			comp = fmt.Sprintf("%s@%s", o.username, host.Name)
+			title = comp
 		}
 
-		title = host.Name()
+		if o.port != 0 && o.port != host.Port {
+			host.Port = o.port
+			comp = fmt.Sprintf("%s:%d", comp, o.port)
+			title = comp
+		}
+
 		url = host.URL()
+		uid = host.UID()
 		subtitle = fmt.Sprintf("%s (from %s)", url, host.Source)
 
-		if dupe := urls[url]; dupe {
-			log.Printf("Ignoring duplicate result: %v", url)
+		if dupe := seen[uid]; dupe {
+			log.Printf("Ignoring duplicate result: %v", uid)
 			continue
 		}
 
-		urls[url] = true
+		seen[uid] = true
 
 		// Feedback item -------------------------------------------------
-		it := wf.NewItem(title)
-		it.Subtitle = subtitle
-		it.Autocomplete = title
-		it.UID = url
-		it.Arg = url
-		it.Valid = true
-		it.SetIcon("icon.png", "")
+		it := wf.NewItem(title).
+			Subtitle(subtitle).
+			Autocomplete(comp).
+			UID(uid).
+			Arg(url).
+			Valid(true).
+			Icon(&aw.Icon{Value: "icon.png"}).
+			SortKey(key)
 
 		// Variables -----------------------------------------------------
-		it.SetVar("query", o.rawInput)
-		it.SetVar("host", host.Hostname)
-		it.SetVar("source", host.Source)
-		it.SetVar("url", url)
+		it.Var("query", o.rawInput).
+			Var("host", host.Hostname).
+			Var("source", host.Source).
+			Var("shell_cmd", "0").
+			Var("url", url)
 
 		// Modifiers -----------------------------------------------------
 
 		// Open SFTP connection instead
-		m := it.NewModifier("cmd")
-		m.SetArg(host.SFTP())
-		m.SetSubtitle(fmt.Sprintf("Open as SFTP connection (%s)", host.SFTP()))
+		it.NewModifier("cmd").
+			Arg(host.SFTP()).
+			Subtitle(fmt.Sprintf("Connect with SFTP (%s)", host.SFTP()))
 
-		// Delete connection from history
-		m = it.NewModifier("alt")
-		if host.Source == "history" {
-			m.SetSubtitle("Delete connection from history")
-			m.SetValid(true)
-			m.SetArg(url)
-		} else {
-			m.SetSubtitle("Connection not from history")
-			m.SetValid(false)
+		// Open mosh connection instead
+		cmd = host.Mosh(os.Getenv("MOSH_CMD"))
+		if exitOnSuccess {
+			cmd += " && exit"
+		}
+		if cmd != "" {
+			it.NewModifier("alt").
+				Subtitle(fmt.Sprintf("Connect with mosh (%s)", cmd)).
+				Arg(cmd).
+				Var("shell_cmd", "1")
 		}
 
 		// Ping host
-		m = it.NewModifier("shift")
-		m.SetSubtitle(fmt.Sprintf("Ping %s", host.Hostname))
-		m.SetArg(host.Hostname)
+		cmd = "ping " + host.Hostname
+		if exitOnSuccess {
+			cmd += " && exit"
+		}
+		it.NewModifier("shift").
+			Subtitle(fmt.Sprintf("Ping %s", host.Hostname)).
+			Arg(cmd).
+			Var("shell_cmd", "1")
 
+		// Delete connection from history
+		m := it.NewModifier("ctrl")
+		if host.Source == "history" {
+			m.Subtitle("Delete connection from history").Arg(url).Valid(true)
+		} else {
+			m.Subtitle("Connection not from history").Valid(false)
+		}
 	}
+
+	// Filter hosts ---------------------------------------------------
+	if o.query != "" {
+		// q := strings.TrimSpace(fmt.Sprintf("%s %s", o.username, o.query))
+		res := wf.Filter(o.query)
+		for i, r := range res {
+			log.Printf("%3d. %5.2f %s", i+1, r.Score, r.SortKey)
+		}
+		log.Printf("%d/%d hosts match `%s`", len(res), totalHosts, o.query)
+	}
+
 	wf.SendFeedback()
 }
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-wffiles=(icon.png info.plist README.md LICENCE.txt alfssh)
+wffiles=(alfssh icon.png info.plist README.md LICENCE.txt)
 
 here="$( cd "$( dirname "$0" )"; pwd )"
 
@@ -36,12 +36,12 @@ rm -rvf ./build
 
 log
 
-log "Hardlinking assets to ./build ..."
+log "Copying assets to ./build ..."
 
 mkdir -vp ./build
 
 for n in $wffiles; do
-    ln -v "$n" ./build/
+    cp -v "$n" ./build/
 done
 
 log
