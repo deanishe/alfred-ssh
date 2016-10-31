@@ -41,9 +41,9 @@ func init() {
 	prov = NewProviders()
 	// disabled = map[string]bool{}
 	Register(&providerWrapper{name: "config", fn: readConfig, priority: 1})
-	Register(&providerWrapper{name: "known_hosts", fn: readKnownHosts, priority: 2})
-	Register(&providerWrapper{name: "/etc/config", fn: readEtcConfig, priority: 4})
-	Register(&providerWrapper{name: "/etc/hosts", fn: readEtcHosts, priority: 3})
+	Register(&providerWrapper{name: "known_hosts", fn: readKnownHosts, priority: 3})
+	Register(&providerWrapper{name: "/etc/config", fn: readEtcConfig, priority: 5})
+	Register(&providerWrapper{name: "/etc/hosts", fn: readEtcHosts, priority: 4})
 }
 
 // --------------------------------------------------------------------

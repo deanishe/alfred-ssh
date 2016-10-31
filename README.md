@@ -1,7 +1,7 @@
 Secure SHell for Alfred
 =======================
 
-Open SSH connections from [Alfred 3][alfredapp] with autosuggestions based on `~/.ssh/known_hosts`, `/etc/hosts` and your history.
+Open SSH/SFTP/mosh connections from [Alfred 3][alfredapp] with autosuggestions based on SSH config files, `/etc/hosts` and your history.
 
 !["Secure SHell Demo"][demo]
 
@@ -9,12 +9,23 @@ Open SSH connections from [Alfred 3][alfredapp] with autosuggestions based on `~
 Features
 --------
 
-- Auto-suggest hostnames from `/etc/hosts` and `~/.ssh/known_hosts` (sources can be individually disabled).
+- Auto-suggest hostnames from `~/.ssh/*` and `/etc/hosts` (sources can be individually disabled).
 - Remembers usernames, so you don't have to type them in every time. (You can also remove connections from your history or disable it entirely.)
 - Alternate actions:
   - Open connection with mosh instead of SSH.
   - Open SFTP connection instead of SSH.
   - Ping host.
+
+
+### Data sources
+
+The workflow reads hosts from the following sources (in this order of priority):
+
+1. `~/.ssh/config`
+2. History (i.e. username + host addresses previously entered by the user)
+3. `~/.ssh/known_hosts`
+4. `/etc/hosts`
+5. `/etc/ssh/ssh_config`
 
 
 Installation
@@ -79,15 +90,12 @@ Changelog
 - v.0.5.0 — 2016-10-31
   - Add support for SSH configuration files (`~/.ssh/config` and `/etc/ssh/ssh_config`)
   - Alternate action: open connection with `mosh`
-
 - v0.4.0 — 2016-05-27
   - Add ability to turn sources of suggestions off #1
-
 - v0.3.0 — 2016-05-26
   - Alternate action: Open SFTP connection
   - Alternate action: Ping host
   - Remember connections with usernames, so you don't have to type the username each time
-
 - v0.2.0 — 2016-05-23
   - First public release
 
