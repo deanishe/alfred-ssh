@@ -597,6 +597,9 @@ func readEtcHosts() []*Host {
 
 		// All other fields are hostnames
 		for _, s := range fields[1:] {
+			if s == "broadcasthost" {
+				continue
+			}
 			hosts = append(hosts, &Host{s, s, 22, "/etc/hosts", ""})
 		}
 	}
