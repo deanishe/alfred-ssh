@@ -131,7 +131,7 @@ func runOptions() *options {
 		}
 	}
 
-	if args["--demo"] == true || os.Getenv("DEMO_MODE") != "" {
+	if args["--demo"] == true || os.Getenv("DEMO_MODE") == "1" {
 		o.useTestData = true
 	}
 
@@ -344,6 +344,7 @@ func run() {
 			Autocomplete(comp).
 			UID(uid).
 			Arg(url).
+			Copytext(url).
 			Valid(true).
 			Icon(&aw.Icon{Value: "icon.png"}).
 			SortKey(key)
