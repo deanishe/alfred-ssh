@@ -64,8 +64,23 @@ There are several options available in the workflow's configuration sheet. Notab
 | `EXTERNAL_TRIGGER`    | Set to `1` to use an External Trigger instead of AppleScript to re-open Alfred. The External Trigger is safer, but leaves Alfred in a weird mode. |
 | `MOSH_CMD`            | Set to the full path to `mosh` if your shell can't find it. Set to empty to disable `mosh` connections.                                           |
 
-
+<!--
 **Please note**: The workflow generates an `ssh://` (or `sftp://`) URL and asks Alfred to open it. Similarly, the `ping` and `mosh` features uses Alfred 3's Terminal Command feature. If it's not opening in the right app, it's not the workflow's fault.
+-->
+
+For SSH and SFTP connections, the workflow creates an `ssh://` (or `sftp://`) URL and asks the system to open it. These will open in whichever application you have configured to handle these URLs (Terminal.app is the default for `ssh://`).
+
+The `ping` and `mosh` commands use Alfred's [Terminal Command][alfterm] output, which also call Terminal.app by default.
+
+
+#### Using iTerm2
+
+If you'd prefer to use iTerm2 rather than Terminal.app, there are two steps:
+
+1. To have `ping` and `mosh` commands open in iTerm2, install [@stuartcryan][stuart]'s [iTerm2 plugin for Alfred][iTerm2-plugin].
+2. To open `ssh:` connections in iTerm2, Set iTerm2 as the default handler for `ssh:` URLs in iTerm2's own preferences under `Profiles > PROFILE_NAME > General > URL Schemes`:
+
+![iTerm2 > Preferences > PROFILE_NAME > General > URL Schemes][iTerm2-screenshot]
 
 
 Licencing & thanks
@@ -75,9 +90,9 @@ This workflow is released under the [MIT Licence][mit].
 
 It uses the following libraries and resources:
 
-- The icon is based on [Octicons][octicons] by [Github][gh] ([SIL Licence][sil]).
-- [ssh_config][ssh_config] ([MIT Licence][mit]) to parse SSH config files.
+- [ssh_config][ssh_config] ([MIT Licence][mit]) by [havoc-io][havoc-io] to parse SSH config files.
 - [awgo][awgo] ([MIT Licence][mit]) for the workflowy stuff.
+- The icon is based on [Octicons][octicons] ([SIL Licence][sil]) by [Github][gh].
 
 This workflow started as a port of [@isometry's][isometry] Python [SSH workflow][ssh-breathe] to Go as a testbed for [awgo][awgo]. It has since gained some additional features.
 
@@ -101,13 +116,18 @@ Changelog
 
 
 [alfredapp]: https://www.alfredapp.com/
+[alfterm]: https://www.alfredapp.com/help/features/terminal/
 [awgo]: https://godoc.org/gogs.deanishe.net/deanishe/awgo
 [demo]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/demo.gif
 [gh-releases]: https://github.com/deanishe/alfred-ssh/releases/latest
 [gh]: https://github.com/
+[havoc-io]: https://github.com/havoc-io
 [isometry]: https://github.com/isometry
+[iTerm2-plugin]: https://github.com/stuartcryan/custom-iterm-applescripts-for-alfred/
+[iTerm2-screenshot]: ./iTerm2.png "iTerm2 Preferences"
 [mit]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/LICENCE.txt
 [octicons]: https://octicons.github.com/
 [sil]: http://scripts.sil.org/OFL
 [ssh_config]: https://github.com/havoc-io/ssh_config
 [ssh-breathe]: https://github.com/isometry/alfredworkflows/tree/master/net.isometry.alfred.ssh
+[stuart]: https://github.com/stuartcryan/
