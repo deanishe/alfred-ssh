@@ -124,7 +124,7 @@ Changelog
 [havoc-io]: https://github.com/havoc-io
 [isometry]: https://github.com/isometry
 [iTerm2-plugin]: https://github.com/stuartcryan/custom-iterm-applescripts-for-alfred/
-[iTerm2-screenshot]: ./iTerm2.png "iTerm2 Preferences"
+[iTerm2-screenshot]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/iTerm2.png "iTerm2 Preferences"
 [mit]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/LICENCE.txt
 [octicons]: https://octicons.github.com/
 [sil]: http://scripts.sil.org/OFL
