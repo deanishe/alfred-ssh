@@ -102,6 +102,8 @@ If you need Alfred 2 support, check out [@isometry's workflow][ssh-breathe].
 Changelog
 ---------
 
+- v.0.6.0 — 2016-11-09
+  - Add in-workflow updates
 - v.0.5.0 — 2016-10-31
   - Add support for SSH configuration files (`~/.ssh/config` and `/etc/ssh/ssh_config`)
   - Alternate action: open connection with `mosh`

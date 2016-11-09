@@ -1,5 +1,6 @@
 # Keep the generated binary out of the repo
 /alfssh
+/build
 # And the file for generating data
 /demo-data.py
 

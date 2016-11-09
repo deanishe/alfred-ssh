@@ -21,28 +21,40 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"strconv"
 
+	"os/exec"
+
+	"github.com/deanishe/alfred-ssh"
 	"github.com/docopt/docopt-go"
-	"gogs.deanishe.net/deanishe/alfred-ssh"
 	"gogs.deanishe.net/deanishe/awgo"
 )
 
+// Name of background job that checks for updates
+const updateJobName = "checkForUpdate"
+
+// GitHub repo
+const repo = "deanishe/alfred-ssh"
+
 var (
-	minScore = 30.0 // Default cut-off for search results
-	usage    = `alfssh [options] [<query>]
+	iconUpdate = &aw.Icon{Value: "update.png"}
+	minScore   = 30.0 // Default cut-off for search results
+	usage      = `alfssh [options] [<query>]
 
 Display a list of know SSH hosts in Alfred 3. If <query>
 is specified, the hostnames will be filtered against it.
 
 Usage:
+	alfssh open <url>
     alfssh search [-d] [<query>]
     alfssh (remember|forget) <url>
     alfssh print (datadir|cachedir|distname|logfile)
+	alfssh check
     alfssh --help|--version
 
 Options:
@@ -61,9 +73,10 @@ func init() {
 	sopts = aw.NewSortOptions()
 	sopts.SeparatorBonus = 10.0
 	wfopts = &aw.Options{
+		GitHub:      repo,
 		SortOptions: sopts,
 	}
-	wf = aw.NewWorkflow(nil)
+	wf = aw.NewWorkflow(wfopts)
 }
 
 // Hosts is a collection of Host objects that supports aw.Sortable.
@@ -83,14 +96,18 @@ func (s Hosts) SortKey(i int) string { return s[i].Name }
 // --------------------------------------------------------------------
 
 type options struct {
-	port        int    // SSH port. Added later by query parser.
-	printVar    string // Set to print the corresponding variable
-	query       string // User query. User input is parsed into query and username
-	rawInput    string // The full, unparsed query
-	remember    bool   // Where to remember or forget url
-	url         string // URL to add to history
-	username    string // SSH username. Added later by query parser.
-	useTestData bool   // Whether to load test data instead of user data
+	checkForUpdate bool     // Download list of available releases
+	forget         bool     // Whether to forget URL
+	open           bool     // Whether to open URL
+	port           int      // SSH port. Added later by query parser.
+	print          bool     // Whether to print a variable
+	printVar       string   // Set to print the corresponding variable
+	query          string   // User query. User input is parsed into query and username
+	rawInput       string   // The full, unparsed query
+	remember       bool     // Where to remember URL
+	url            *url.URL // URL to add to history
+	username       string   // SSH username. Added later by query parser.
+	useTestData    bool     // Whether to load test data instead of user data
 }
 
 // runOptions constructs the program options from command-line arguments and
@@ -101,16 +118,43 @@ func runOptions() *options {
 
 	// Parse options --------------------------------------------------
 	vstr := fmt.Sprintf("%s/%v (awgo/%v)", wf.Name(),
-		wf.Version(), aw.AwgoVersion)
+		wf.Version(), aw.AwGoVersion)
 
-	args, err := docopt.Parse(usage, nil, true, vstr, false)
+	args, err := docopt.Parse(usage, wf.Args(), true, vstr, false)
 	if err != nil {
 		panic(fmt.Sprintf("Error parsing CLI options : %v", err))
 	}
-	// log.Printf("args=%v", args)
+	// log.Printf("args=%+v", args)
 
 	// Alternate Actions
+	if args["check"] == true {
+		o.checkForUpdate = true
+	}
+	if args["remember"] == true {
+		o.remember = true
+	}
+	if args["forget"] == true {
+		o.forget = true
+	}
+	if args["open"] == true {
+		o.open = true
+	}
 	if args["print"] == true {
+		o.print = true
+	}
+
+	if args["<url>"] != nil {
+		if s, ok := args["<url>"].(string); ok {
+			o.url, err = url.Parse(s)
+			if err != nil || !o.url.IsAbs() {
+				wf.Fatalf("Invalid URL: %s", s)
+			}
+		} else {
+			wf.Fatal("Can't convert <url> to string.")
+		}
+	}
+
+	if o.print {
 		if args["datadir"] == true {
 			o.printVar = "data"
 		} else if args["cachedir"] == true {
@@ -119,15 +163,6 @@ func runOptions() *options {
 			o.printVar = "log"
 		} else if args["distname"] == true {
 			o.printVar = "dist"
-		}
-	} else if args["remember"] == true || args["forget"] == true {
-		if s, ok := args["<url>"].(string); ok {
-			o.url = s
-		} else {
-			panic("Can't convert <url> to string.")
-		}
-		if args["remember"] == true {
-			o.remember = true
 		}
 	}
 
@@ -140,7 +175,7 @@ func runOptions() *options {
 			o.query = s
 			o.rawInput = s
 		} else {
-			panic("Can't convert query to string.")
+			wf.Fatal("Can't convert query to string.")
 		}
 	}
 
@@ -153,6 +188,7 @@ func run() {
 	var hosts Hosts
 	var host *assh.Host
 	// var h *assh.History
+	var noUIDs bool
 	var historyPath string
 
 	o := runOptions()
@@ -165,31 +201,76 @@ func run() {
 	// log.Printf("options=%+v", o)
 
 	// ===================== Alternate actions ========================
-	if o.printVar == "data" {
+	if o.checkForUpdate {
+		wf.TextErrors = true
 
-		fmt.Println(wf.DataDir())
+		if err := wf.CheckForUpdate(); err != nil {
+			wf.FatalError(err)
+		}
+		return
+	}
+
+	// Run update check
+	if wf.UpdateCheckDue() && !aw.IsRunning(updateJobName) {
+		log.Println("Checking for update...")
+		cmd := exec.Command("./alfssh", "check")
+		if err := aw.RunInBackground(updateJobName, cmd); err != nil {
+			log.Printf("Error running update check: %s", err)
+		}
+	}
+
+	if o.print {
+
+		if o.printVar == "data" {
+
+			fmt.Println(wf.DataDir())
+			return
+
+		} else if o.printVar == "cache" {
+
+			fmt.Println(wf.CacheDir())
+			return
+
+		} else if o.printVar == "log" {
+
+			fmt.Println(wf.LogFile())
+			return
+
+		} else if o.printVar == "dist" {
+
+			name := strings.Replace(
+				fmt.Sprintf("%s-%s.alfredworkflow", wf.Name(), wf.Version()),
+				" ", "-", -1)
+			fmt.Println(name)
+
+			return
+
+		}
+	} else if o.open {
+
+		wf.TextErrors = true
+
+		var (
+			argv     = []string{}
+			sshHdlr  = os.Getenv("SSH_APP")
+			sftpHdlr = os.Getenv("SFTP_APP")
+		)
+		log.Printf("Opening URL %s", o.url)
+		if o.url.Scheme == "ssh" && sshHdlr != "" {
+			argv = append(argv, "-a", sshHdlr)
+		} else if o.url.Scheme == "sftp" && sftpHdlr != "" {
+			argv = append(argv, "-a", sftpHdlr)
+		}
+		argv = append(argv, o.url.String())
+		cmd := exec.Command("open", argv...)
+		log.Printf("Command: %v", cmd)
+		out, err := cmd.CombinedOutput()
+		if err != nil {
+			wf.Fatal(string(out))
+		}
 		return
 
-	} else if o.printVar == "cache" {
-
-		fmt.Println(wf.CacheDir())
-		return
-
-	} else if o.printVar == "log" {
-
-		fmt.Println(wf.LogFile())
-		return
-
-	} else if o.printVar == "dist" {
-
-		name := strings.Replace(
-			fmt.Sprintf("%s-%s.alfredworkflow", wf.Name(), wf.Version()),
-			" ", "-", -1)
-		fmt.Println(name)
-
-		return
-
-	} else if o.url != "" { // Remember or forget URL
+	} else if o.remember || o.forget {
 
 		if os.Getenv("DISABLE_HISTORY") == "1" {
 			log.Println("History disabled. Ignoring.")
@@ -202,18 +283,18 @@ func run() {
 			panic(err)
 		}
 
+		u := o.url.String()
 		if o.remember { // Add URL to history
-
-			if err := h.Add(o.url); err != nil {
+			if err := h.Add(u); err != nil {
 				log.Printf("Error adding URL : %v", err)
 				panic(err)
 			}
 		} else { // Remove URL from history
-			if err := h.Remove(o.url); err != nil {
+			if err := h.Remove(u); err != nil {
 				log.Printf("Error removing URL : %v", err)
 				panic(err)
 			}
-			log.Printf("Removed %s from history", o.url)
+			log.Printf("Removed %s from history", u)
 		}
 
 		return
@@ -236,6 +317,16 @@ func run() {
 	}
 
 	log.Printf("query=%v, username=%v, port=%v", o.query, o.username, o.port)
+
+	// Show update status if there's no query
+	if o.query == "" && wf.UpdateAvailable() {
+		noUIDs = true
+		wf.NewItem("An update is available!").
+			Subtitle("↩ or ⇥ to install").
+			Valid(false).
+			Autocomplete("workflow:update").
+			Icon(iconUpdate)
+	}
 
 	// Load hosts -----------------------------------------------------
 
@@ -342,12 +433,15 @@ func run() {
 		it := wf.NewItem(title).
 			Subtitle(subtitle).
 			Autocomplete(comp).
-			UID(uid).
 			Arg(url).
 			Copytext(url).
 			Valid(true).
 			Icon(&aw.Icon{Value: "icon.png"}).
 			SortKey(key)
+
+		if !noUIDs {
+			it.UID(uid)
+		}
 
 		// Variables -----------------------------------------------------
 		it.Var("query", o.rawInput).

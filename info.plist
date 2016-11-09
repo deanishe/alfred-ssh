@@ -41,6 +41,19 @@
 				<true/>
 			</dict>
 		</array>
+		<key>4575A48A-57E5-4A98-AFD8-0F611206F38C</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>042F981F-B8D7-44AA-9AA4-E9D14F71BF97</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</key>
 		<array>
 			<dict>
@@ -54,6 +67,8 @@
 				<false/>
 			</dict>
 		</array>
+		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
+		<array/>
 		<key>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</key>
 		<array>
 			<dict>
@@ -81,7 +96,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>83976B20-A05A-4429-8698-363973CC1793</string>
+				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -91,7 +106,7 @@
 			</dict>
 			<dict>
 				<key>destinationuid</key>
-				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+				<string>4575A48A-57E5-4A98-AFD8-0F611206F38C</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -211,6 +226,30 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string># Add URL to History
+./alfssh remember "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>action</key>
 				<integer>0</integer>
 				<key>argument</key>
@@ -254,25 +293,6 @@
 			<string>alfred.workflow.utility.argument</string>
 			<key>uid</key>
 			<string>D05BB3AC-1409-4983-B5B1-9E1395C538C1</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>browser</key>
-				<string></string>
-				<key>spaces</key>
-				<string></string>
-				<key>url</key>
-				<string>{query}</string>
-				<key>utf8</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.openurl</string>
-			<key>uid</key>
-			<string>83976B20-A05A-4429-8698-363973CC1793</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -336,6 +356,50 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./alfssh open "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>4575A48A-57E5-4A98-AFD8-0F611206F38C</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<true/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>ERROR</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>042F981F-B8D7-44AA-9AA4-E9D14F71BF97</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>inputstring</key>
 				<string>{var:shell_cmd}</string>
 				<key>matchcasesensitive</key>
@@ -351,30 +415,6 @@
 			<string>8B1647C7-3F08-49D7-9C04-4447395B6CF0</string>
 			<key>version</key>
 			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string># Add URL to History
-./alfssh remember "$1"</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
-			<key>version</key>
-			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -568,6 +608,17 @@ When removing a connection from the History, the workflow re-opens itself with t
 The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the External Trigger instead of calling itself by keyword ("ssh").</string>
 	<key>uidata</key>
 	<dict>
+		<key>042F981F-B8D7-44AA-9AA4-E9D14F71BF97</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>1</integer>
+			<key>note</key>
+			<string>Show error message if open fails</string>
+			<key>xpos</key>
+			<integer>850</integer>
+			<key>ypos</key>
+			<integer>210</integer>
+		</dict>
 		<key>1A62410B-26D8-493D-B57F-599DC4A36FD1</key>
 		<dict>
 			<key>colorindex</key>
@@ -577,7 +628,7 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>xpos</key>
 			<integer>660</integer>
 			<key>ypos</key>
-			<integer>520</integer>
+			<integer>430</integer>
 		</dict>
 		<key>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</key>
 		<dict>
@@ -586,7 +637,20 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>xpos</key>
 			<integer>200</integer>
 			<key>ypos</key>
-			<integer>190</integer>
+			<integer>210</integer>
+		</dict>
+		<key>4575A48A-57E5-4A98-AFD8-0F611206F38C</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>4</integer>
+			<key>note</key>
+			<string>Open SSH/SFTP URL
+
+Use SSH_APP and SFTP_APP workflow variables to change the application used</string>
+			<key>xpos</key>
+			<integer>660</integer>
+			<key>ypos</key>
+			<integer>210</integer>
 		</dict>
 		<key>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</key>
 		<dict>
@@ -595,9 +659,9 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>External trigger is on</string>
 			<key>xpos</key>
-			<integer>800</integer>
+			<integer>770</integer>
 			<key>ypos</key>
-			<integer>980</integer>
+			<integer>890</integer>
 		</dict>
 		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
 		<dict>
@@ -608,7 +672,7 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>xpos</key>
 			<integer>660</integer>
 			<key>ypos</key>
-			<integer>350</integer>
+			<integer>30</integer>
 		</dict>
 		<key>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</key>
 		<dict>
@@ -617,31 +681,20 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>Set {query} from workflow variable</string>
 			<key>xpos</key>
-			<integer>650</integer>
+			<integer>620</integer>
 			<key>ypos</key>
-			<integer>730</integer>
-		</dict>
-		<key>83976B20-A05A-4429-8698-363973CC1793</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>4</integer>
-			<key>note</key>
-			<string>Open SSH/SFTP URL with default handler</string>
-			<key>xpos</key>
-			<integer>660</integer>
-			<key>ypos</key>
-			<integer>190</integer>
+			<integer>640</integer>
 		</dict>
 		<key>8B1647C7-3F08-49D7-9C04-4447395B6CF0</key>
 		<dict>
 			<key>colorindex</key>
 			<integer>4</integer>
 			<key>note</key>
-			<string>shell_cmd != 1</string>
+			<string>Is not shell command</string>
 			<key>xpos</key>
 			<integer>490</integer>
 			<key>ypos</key>
-			<integer>220</integer>
+			<integer>240</integer>
 		</dict>
 		<key>A5A07BAF-5D27-4E64-BC61-717AC34E5153</key>
 		<dict>
@@ -663,7 +716,7 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>xpos</key>
 			<integer>450</integer>
 			<key>ypos</key>
-			<integer>700</integer>
+			<integer>610</integer>
 		</dict>
 		<key>C246528B-48CD-4C6B-A6AA-5B80BD18802C</key>
 		<dict>
@@ -672,9 +725,9 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>External trigger is off</string>
 			<key>xpos</key>
-			<integer>800</integer>
+			<integer>770</integer>
 			<key>ypos</key>
-			<integer>730</integer>
+			<integer>640</integer>
 		</dict>
 		<key>C9ACEFF8-36DB-42A5-8FC1-95D9A77A7FBA</key>
 		<dict>
@@ -692,11 +745,11 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>colorindex</key>
 			<integer>7</integer>
 			<key>note</key>
-			<string>shell_cmd=1</string>
+			<string>Is shell command</string>
 			<key>xpos</key>
 			<integer>490</integer>
 			<key>ypos</key>
-			<integer>550</integer>
+			<integer>460</integer>
 		</dict>
 		<key>D05BB3AC-1409-4983-B5B1-9E1395C538C1</key>
 		<dict>
@@ -718,9 +771,9 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 
 Disabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to enable.</string>
 			<key>xpos</key>
-			<integer>930</integer>
+			<integer>870</integer>
 			<key>ypos</key>
-			<integer>950</integer>
+			<integer>860</integer>
 		</dict>
 		<key>EC55D85A-7A17-4ACF-A406-B9F53CB22425</key>
 		<dict>
@@ -731,9 +784,9 @@ Disabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to enable
 
 Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable.</string>
 			<key>xpos</key>
-			<integer>930</integer>
+			<integer>870</integer>
 			<key>ypos</key>
-			<integer>700</integer>
+			<integer>610</integer>
 		</dict>
 		<key>F6FCC74B-9EC0-47A6-8C0D-B445AD7C9722</key>
 		<dict>
@@ -742,7 +795,7 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 			<key>xpos</key>
 			<integer>30</integer>
 			<key>ypos</key>
-			<integer>190</integer>
+			<integer>210</integer>
 		</dict>
 	</dict>
 	<key>variables</key>
@@ -765,10 +818,14 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 		<string>0</string>
 		<key>MOSH_CMD</key>
 		<string>mosh</string>
+		<key>SFTP_APP</key>
+		<string></string>
+		<key>SSH_APP</key>
+		<string></string>
 	</dict>
 	<key>version</key>
-	<string>0.5</string>
+	<string>0.6</string>
 	<key>webaddress</key>
-	<string>http://www.deanishe.net</string>
+	<string>https://github.com/deanishe/alfred-ssh</string>
 </dict>
 </plist>
