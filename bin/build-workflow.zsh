@@ -1,10 +1,11 @@
 #!/usr/bin/env zsh
 
-wffiles=(alfssh icon.png update.png info.plist README.md LICENCE.txt)
+wffiles=(alfssh info.plist README.md LICENCE.txt)
 # Icons
-icons=(icons/icon.iconset icons/update.iconset)
+icons=(icon.png update.png)
+wffiles+=($icons)
 
-here="$( cd "$( dirname "$0" )"; pwd )"
+workdir="$( cd "$( dirname "$0" )"/../; pwd )"
 delbuild=1
 
 log() {
@@ -25,7 +26,7 @@ Usage:
     build-workflow.zsh -h
 
 Options:
-    -c      Clean the build directory
+    -c      Clean the dist directory
     -d      Also build distributable .alfredworkflow file
     -h      Show this help message and exit
 EOS
@@ -52,12 +53,12 @@ done
 shift $((OPTIND-1))
 
 cleanup() {
-    local p="${here}/build"
+    local p="${workdir}/dist"
     log "Cleaning up ..."
-    test -d "$p" && rm -rf ./build/
+    test -d "$p" && rm -rf ./dist/
 }
 
-pushd "$here" &> /dev/null
+pushd "$workdir" &>/dev/null
 
 log "Building executable(s) ..."
 go build -v -o ./alfssh ./cmd/alfssh
@@ -74,22 +75,22 @@ chmod 755 ./alfssh
 
 log
 
-log "Cleaning ./build ..."
-rm -rvf ./build
+log "Cleaning ./dist ..."
+rm -rvf ./dist
 
 log
 
-log "Copying assets to ./build ..."
+log "Copying icons to root ..."
 
 for f in $icons; do
     n="${f:t:r}"
-    cp -v "${f}/icon_128x128.png" "./${n}.png"
+    cp -v "icons/${f}" "./${n}.png"
 done
 
-mkdir -vp ./build
+mkdir -vp ./dist
 
 for n in $wffiles; do
-    cp -v "$n" ./build/
+    cp -v "$n" ./dist/
 done
 
 
@@ -112,7 +113,7 @@ if [[ $do_dist -eq 1 ]]; then
         log
     fi
 
-    pushd ./build/ &> /dev/null
+    pushd ./dist/ &>/dev/null
 
     log "Cleaning info.plist ..."
     /usr/libexec/PlistBuddy -c 'Delete :variables:DEMO_MODE' info.plist
@@ -127,7 +128,7 @@ if [[ $do_dist -eq 1 ]]; then
         popd &> /dev/null
         exit $ST_ZIP
     fi
-    popd &> /dev/null
+    popd &>/dev/null
 
     log
     log "Wrote '${zipfile}' in '$( pwd )'"
@@ -136,4 +137,4 @@ fi
 [[ $do_clean -eq 1 ]] && cleanup
 
 
-popd &> /dev/null
+popd &>/dev/null
