@@ -1,7 +1,11 @@
 # Keep the generated binary out of the repo
-/alfssh
+/assh
 /build
 /dist
+
+# Local env
+.autoenv.zsh
+.autoenv_leave.zsh
 
 
 # Created by https://www.gitignore.io/api/vim,go

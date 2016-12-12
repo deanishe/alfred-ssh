@@ -1,11 +1,13 @@
 #!/usr/bin/env zsh
 
-wffiles=(alfssh info.plist README.md LICENCE.txt)
+wffiles=(assh info.plist README.md LICENCE.txt)
 # Icons
 icons=(icon.png update.png)
 wffiles+=($icons)
 
 workdir="$( cd "$( dirname "$0" )"/../; pwd )"
+builddir="${workdir}/build"
+distdir="${workdir}/dist"
 delbuild=1
 
 log() {
@@ -13,6 +15,8 @@ log() {
 }
 
 do_dist=0
+do_build=1
+do_copy=1
 do_clean=0
 
 usage() {
@@ -22,20 +26,22 @@ build-workflow.zsh [options]
 Build the .alfredworkflow file
 
 Usage:
-    build-workflow.zsh [-d] [-c]
+    build-workflow.zsh [-c] [-d]
+    build-workflow.zsh -x
     build-workflow.zsh -h
 
 Options:
-    -c      Clean the dist directory
+    -c      Only copy assets to root (don't build workflow)
     -d      Also build distributable .alfredworkflow file
+    -x      Clean build and dist directories
     -h      Show this help message and exit
 EOS
 }
 
-while getopts ":cdh" opt; do
+while getopts ":cdhx" opt; do
   case $opt in
     c)
-      do_clean=1
+      do_build=0
       ;;
     d)
       do_dist=1
@@ -43,6 +49,9 @@ while getopts ":cdh" opt; do
     h)
       usage
       exit 0
+      ;;
+    x)
+      do_clean=1
       ;;
     \?)
       log "Invalid option: -$OPTARG"
@@ -53,52 +62,67 @@ done
 shift $((OPTIND-1))
 
 cleanup() {
-    local p="${workdir}/dist"
     log "Cleaning up ..."
-    test -d "$p" && rm -rf ./dist/
+    test -d "$distdir" && rm -rf "$distdir"
+    test -d "$builddir" && rm -rf "$builddir"
 }
 
 pushd "$workdir" &>/dev/null
 
-log "Building executable(s) ..."
-go build -v -o ./alfssh ./cmd/alfssh
-ST_BUILD=$?
-if [ "$ST_BUILD" != 0 ]; then
-    log "Error building executable."
+
+if [[ $do_clean -eq 1 ]]; then
     cleanup
-    popd &> /dev/null
-    exit $ST_BUILD
+    popd &>/dev/null
+    exit 0
 fi
 
-chmod 755 ./alfssh
-# cp -v ./alfssh ./build/alfssh
 
-log
+if [[ $do_copy -eq 1 ]]; then
+    log "Copying icons to root ..."
 
-log "Cleaning ./dist ..."
-rm -rvf ./dist
+    for f in $icons; do
+        n="${f:t:r}"
+        cp -v "icons/${f}" "./${n}.png"
+    done
+fi
 
-log
+if [[ $do_build -eq 1 ]]; then
 
-log "Copying icons to root ..."
+    log "Building executable(s) ..."
+    go build -v -o ./assh ./cmd/assh
+    ST_BUILD=$?
+    if [ "$ST_BUILD" != 0 ]; then
+        log "Error building executable."
+        cleanup
+        popd &> /dev/null
+        exit $ST_BUILD
+    fi
 
-for f in $icons; do
-    n="${f:t:r}"
-    cp -v "icons/${f}" "./${n}.png"
-done
+    chmod 755 ./assh
 
-mkdir -vp ./dist
+    log
 
-for n in $wffiles; do
-    cp -v "$n" ./dist/
-done
+    log "Cleaning $builddir ..."
+    rm -rvf "$builddir"
 
+    log
 
-log
+    mkdir -vp "$builddir"
+
+    for n in $wffiles; do
+        cp -v "$n" "$builddir"
+    done
+
+    log
+fi
 
 if [[ $do_dist -eq 1 ]]; then
+
+    log "Cleaning $distdir ..."
+    rm -rvf "$distdir"
+
     # Get the dist filename from the executable
-    zipfile="$(./alfssh print distname 2> /dev/null)"
+    zipfile="$( ./assh print distname 2>/dev/null )"
     if [ "$?" -ne 0 ]; then
         log "Error getting distname from alfssh."
         cleanup
@@ -107,34 +131,32 @@ if [[ $do_dist -eq 1 ]]; then
 
     log
 
-    if test -e "$zipfile"; then
-        log "Removing existing .alfredworkflow file ..."
-        rm -rvf "$zipfile"
-        log
-    fi
+    # if test -e "$zipfile"; then
+    #     log "Removing existing .alfredworkflow file ..."
+    #     rm -rvf "$zipfile"
+    #     log
+    # fi
 
-    pushd ./dist/ &>/dev/null
+    pushd "$builddir" &>/dev/null
 
     log "Cleaning info.plist ..."
     /usr/libexec/PlistBuddy -c 'Delete :variables:DEMO_MODE' info.plist
 
     log "Building .alfredworkflow file ..."
-    zip "../${zipfile}" ./*
+    mkdir -vp "$distdir"
+    zip "${distdir}/${zipfile}" ./*
     ST_ZIP=$?
     if [ "$ST_ZIP" != 0 ]; then
         log "Error creating .alfredworkflow file."
-        popd &> /dev/null
+        popd &>/dev/null
         cleanup
-        popd &> /dev/null
+        popd &>/dev/null
         exit $ST_ZIP
     fi
     popd &>/dev/null
 
     log
-    log "Wrote '${zipfile}' in '$( pwd )'"
+    log "Wrote '${zipfile}' in '${distdir}'"
 fi
-
-[[ $do_clean -eq 1 ]] && cleanup
-
 
 popd &>/dev/null

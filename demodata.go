@@ -6,7 +6,7 @@
 // Created on 2016-05-23
 //
 
-package assh
+package ssh
 
 // Useful for screenshots
 var testHostnames = []string{
@@ -42,11 +42,16 @@ var testHostnames = []string{
 }
 
 // TestHosts loads fake test data instead of real hosts.
-func TestHosts() []*Host {
-	hosts := make([]*Host, len(testHostnames))
+func TestHosts() []Host {
+	hosts := make([]Host, len(testHostnames))
 
 	for i, name := range testHostnames {
-		hosts[i] = &Host{name, name, 22, "test data", ""}
+		hosts[i] = &BaseHost{
+			name:     name,
+			hostname: name,
+			source:   "test data",
+			port:     22,
+		}
 	}
 
 	return hosts

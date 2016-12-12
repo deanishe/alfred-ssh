@@ -12,17 +12,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>8B1647C7-3F08-49D7-9C04-4447395B6CF0</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>D02E857F-D8BD-4AE5-8764-71CFF97757CA</string>
+				<string>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -39,6 +29,19 @@
 				<string></string>
 				<key>vitoclose</key>
 				<true/>
+			</dict>
+		</array>
+		<key>3AA31B78-5898-4B51-A25F-B970B140ECB1</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 		<key>4575A48A-57E5-4A98-AFD8-0F611206F38C</key>
@@ -69,6 +72,39 @@
 		</array>
 		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
 		<array/>
+		<key>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3AA31B78-5898-4B51-A25F-B970B140ECB1</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>8B1647C7-3F08-49D7-9C04-4447395B6CF0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>D02E857F-D8BD-4AE5-8764-71CFF97757CA</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</key>
 		<array>
 			<dict>
@@ -94,16 +130,6 @@
 		</array>
 		<key>8B1647C7-3F08-49D7-9C04-4447395B6CF0</key>
 		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>52720D61-C3AC-4297-8393-48F4D888BBED</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
 			<dict>
 				<key>destinationuid</key>
 				<string>4575A48A-57E5-4A98-AFD8-0F611206F38C</string>
@@ -232,7 +258,7 @@
 				<integer>102</integer>
 				<key>script</key>
 				<string># Add URL to History
-./alfssh remember "$1"</string>
+./assh remember "$url"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -299,6 +325,25 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>inputstring</key>
+				<string>{var:source}</string>
+				<key>matchcasesensitive</key>
+				<true/>
+				<key>matchmode</key>
+				<integer>0</integer>
+				<key>matchstring</key>
+				<string>user input</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.filter</string>
+			<key>uid</key>
+			<string>3AA31B78-5898-4B51-A25F-B970B140ECB1</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
 				<key>argumenttype</key>
@@ -318,7 +363,8 @@
 				<key>runningsubtext</key>
 				<string>Reading history…</string>
 				<key>script</key>
-				<string>./alfssh search "$1"
+				<string># Search all hosts
+./assh search "$1"
 </string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -343,6 +389,27 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<true/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>ERROR</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>042F981F-B8D7-44AA-9AA4-E9D14F71BF97</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>triggerid</key>
 				<string>ssh</string>
 			</dict>
@@ -361,7 +428,8 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>./alfssh open "$1"</string>
+				<string># Open URL
+./assh open "$1"</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -379,21 +447,22 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>lastpathcomponent</key>
+				<key>argument</key>
+				<string>.
+/-------- SSH ---------\
+query="{query}"
+variables=
+{allvars}
+\-------- SSH ---------/</string>
+				<key>cleardebuggertext</key>
 				<false/>
-				<key>onlyshowifquerypopulated</key>
+				<key>processoutputs</key>
 				<true/>
-				<key>removeextension</key>
-				<false/>
-				<key>text</key>
-				<string>{query}</string>
-				<key>title</key>
-				<string>ERROR</string>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.output.notification</string>
+			<string>alfred.workflow.utility.debug</string>
 			<key>uid</key>
-			<string>042F981F-B8D7-44AA-9AA4-E9D14F71BF97</string>
+			<string>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -459,7 +528,8 @@
 				<integer>102</integer>
 				<key>script</key>
 				<string># Remove URL from History
-./alfssh forget "$1"
+./assh forget "$name" "$url"
+
 # Send query to next action
 echo -n "$query"</string>
 				<key>scriptargtype</key>
@@ -615,7 +685,7 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>Show error message if open fails</string>
 			<key>xpos</key>
-			<integer>850</integer>
+			<integer>920</integer>
 			<key>ypos</key>
 			<integer>210</integer>
 		</dict>
@@ -626,7 +696,7 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>Alternate Action: Run shell command (e.g. ping or mosh)</string>
 			<key>xpos</key>
-			<integer>660</integer>
+			<integer>730</integer>
 			<key>ypos</key>
 			<integer>430</integer>
 		</dict>
@@ -639,6 +709,17 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>ypos</key>
 			<integer>210</integer>
 		</dict>
+		<key>3AA31B78-5898-4B51-A25F-B970B140ECB1</key>
+		<dict>
+			<key>colorindex</key>
+			<integer>2</integer>
+			<key>note</key>
+			<string>User-entered host</string>
+			<key>xpos</key>
+			<integer>600</integer>
+			<key>ypos</key>
+			<integer>60</integer>
+		</dict>
 		<key>4575A48A-57E5-4A98-AFD8-0F611206F38C</key>
 		<dict>
 			<key>colorindex</key>
@@ -648,7 +729,7 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 
 Use SSH_APP and SFTP_APP workflow variables to change the application used</string>
 			<key>xpos</key>
-			<integer>660</integer>
+			<integer>730</integer>
 			<key>ypos</key>
 			<integer>210</integer>
 		</dict>
@@ -659,20 +740,27 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>External trigger is on</string>
 			<key>xpos</key>
-			<integer>770</integer>
+			<integer>840</integer>
 			<key>ypos</key>
 			<integer>890</integer>
 		</dict>
 		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>4</integer>
+			<integer>2</integer>
 			<key>note</key>
 			<string>Remember connection in History (if there's a username)</string>
 			<key>xpos</key>
-			<integer>660</integer>
+			<integer>730</integer>
 			<key>ypos</key>
 			<integer>30</integer>
+		</dict>
+		<key>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</key>
+		<dict>
+			<key>xpos</key>
+			<integer>400</integer>
+			<key>ypos</key>
+			<integer>240</integer>
 		</dict>
 		<key>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</key>
 		<dict>
@@ -681,7 +769,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Set {query} from workflow variable</string>
 			<key>xpos</key>
-			<integer>620</integer>
+			<integer>690</integer>
 			<key>ypos</key>
 			<integer>640</integer>
 		</dict>
@@ -692,7 +780,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Is not shell command</string>
 			<key>xpos</key>
-			<integer>490</integer>
+			<integer>600</integer>
 			<key>ypos</key>
 			<integer>240</integer>
 		</dict>
@@ -714,7 +802,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Alternate Action: Forget connection from History</string>
 			<key>xpos</key>
-			<integer>450</integer>
+			<integer>500</integer>
 			<key>ypos</key>
 			<integer>610</integer>
 		</dict>
@@ -725,7 +813,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>External trigger is off</string>
 			<key>xpos</key>
-			<integer>770</integer>
+			<integer>840</integer>
 			<key>ypos</key>
 			<integer>640</integer>
 		</dict>
@@ -736,7 +824,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Call ssh External Trigger below</string>
 			<key>xpos</key>
-			<integer>370</integer>
+			<integer>360</integer>
 			<key>ypos</key>
 			<integer>30</integer>
 		</dict>
@@ -747,7 +835,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Is shell command</string>
 			<key>xpos</key>
-			<integer>490</integer>
+			<integer>600</integer>
 			<key>ypos</key>
 			<integer>460</integer>
 		</dict>
@@ -771,7 +859,7 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 
 Disabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to enable.</string>
 			<key>xpos</key>
-			<integer>870</integer>
+			<integer>940</integer>
 			<key>ypos</key>
 			<integer>860</integer>
 		</dict>
@@ -784,7 +872,7 @@ Disabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to enable
 
 Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable.</string>
 			<key>xpos</key>
-			<integer>870</integer>
+			<integer>940</integer>
 			<key>ypos</key>
 			<integer>610</integer>
 		</dict>
@@ -800,8 +888,6 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 	</dict>
 	<key>variables</key>
 	<dict>
-		<key>DEMO_MODE</key>
-		<string>0</string>
 		<key>DISABLE_CONFIG</key>
 		<string>0</string>
 		<key>DISABLE_ETC_CONFIG</key>
@@ -824,7 +910,7 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 		<string></string>
 	</dict>
 	<key>version</key>
-	<string>0.6</string>
+	<string>0.7</string>
 	<key>webaddress</key>
 	<string>https://github.com/deanishe/alfred-ssh</string>
 </dict>
