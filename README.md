@@ -102,7 +102,8 @@ If you need Alfred 2 support, check out [@isometry's workflow][ssh-breathe].
 Changelog
 ---------
 
-- v0.7.0 — 2016-12-12
+- v0.7.1 — 2016-12-12
+  - Fix updater bug
   - Smarter SSH URLs for hosts from `~/.ssh/config`
   - Better removal of duplicates
 - v0.6.0 — 2016-11-09

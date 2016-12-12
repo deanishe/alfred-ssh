@@ -410,7 +410,7 @@ func run() {
 	// Run update check
 	if wf.UpdateCheckDue() && !aw.IsRunning(updateJobName) {
 		log.Println("Checking for update...")
-		cmd := exec.Command("./alfssh", "check")
+		cmd := exec.Command("./assh", "check")
 		if err := aw.RunInBackground(updateJobName, cmd); err != nil {
 			log.Printf("Error running update check: %s", err)
 		}
