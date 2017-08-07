@@ -346,6 +346,8 @@
 			<dict>
 				<key>alfredfiltersresults</key>
 				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
@@ -528,7 +530,7 @@ variables=
 				<integer>102</integer>
 				<key>script</key>
 				<string># Remove URL from History
-./assh forget "$name" "$url"
+./assh forget "$url"
 
 # Send query to next action
 echo -n "$query"</string>
@@ -910,7 +912,7 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 		<string></string>
 	</dict>
 	<key>version</key>
-	<string>0.7.1</string>
+	<string>0.7.2</string>
 	<key>webaddress</key>
 	<string>https://github.com/deanishe/alfred-ssh</string>
 </dict>

@@ -31,9 +31,9 @@ import (
 
 	"os/exec"
 
+	"git.deanishe.net/deanishe/awgo"
 	"github.com/deanishe/alfred-ssh"
 	"github.com/docopt/docopt-go"
-	"gogs.deanishe.net/deanishe/awgo"
 )
 
 // Name of background job that checks for updates
