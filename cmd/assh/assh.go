@@ -31,8 +31,12 @@ import (
 
 	"os/exec"
 
-	"git.deanishe.net/deanishe/awgo"
 	"github.com/deanishe/alfred-ssh"
+	"github.com/deanishe/awgo"
+	"github.com/deanishe/awgo/fuzzy"
+	"github.com/deanishe/awgo/update"
+	"github.com/deanishe/awgo/util"
+
 	"github.com/docopt/docopt-go"
 )
 
@@ -86,19 +90,17 @@ Options:
                       mode can also turned on by setting the
                       environment variable DEMO_MODE=1
 `
-	wfopts *aw.Options
-	sopts  *aw.SortOptions
+	// wfopts *aw.Options
+	// sopts  *aw.SortOptions
+	sopts  []fuzzy.Option
+	wfopts []aw.Option
 	wf     *aw.Workflow
 )
 
 func init() {
-	sopts = aw.NewSortOptions()
-	sopts.SeparatorBonus = 10.0
-	wfopts = &aw.Options{
-		GitHub:      repo,
-		SortOptions: sopts,
-	}
-	wf = aw.NewWorkflow(wfopts)
+	// sopts = aw.NewSortOptions()
+	sopts = append(sopts, fuzzy.SeparatorBonus(10.0))
+	wf = aw.New(aw.SortOptions(sopts...), update.GitHub(repo))
 }
 
 // Hosts is a collection of Host objects that supports aw.Sortable.
@@ -464,7 +466,7 @@ func itemForHost(host ssh.Host, o *options) *aw.Item {
 		UID(uid).
 		Valid(true).
 		Icon(&aw.Icon{Value: "icon.png"}).
-		SortKey(key)
+		Match(key)
 
 	// Variables
 	it.Var("query", o.rawInput).
@@ -552,7 +554,7 @@ func loadHosts(o *options) []ssh.Host {
 	}
 	hosts = append(hosts, sources.Hosts()...)
 
-	log.Printf("%d host(s) loaded in %s", len(hosts), aw.ReadableDuration(time.Since(start)))
+	log.Printf("%d host(s) loaded in %s", len(hosts), util.ReadableDuration(time.Since(start)))
 	return hosts
 }
 
