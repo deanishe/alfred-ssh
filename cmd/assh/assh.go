@@ -554,7 +554,7 @@ func loadHosts(o *options) []ssh.Host {
 	}
 	hosts = append(hosts, sources.Hosts()...)
 
-	log.Printf("%d host(s) loaded in %s", len(hosts), util.ReadableDuration(time.Since(start)))
+	log.Printf("%d host(s) loaded in %s", len(hosts), util.HumanDuration(time.Since(start)))
 	return hosts
 }
 
