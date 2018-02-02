@@ -16,7 +16,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/havoc-io/ssh_config"
+	"github.com/danieljimenez/ssh_config"
 )
 
 // ConfigHost is Host parsed from SSH config-format files.
