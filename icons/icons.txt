@@ -1,0 +1,29 @@
+# Icons from webfonts via http://icons.deanishe.net
+#
+# Script ../bin/icons reads this file and downloads the
+# specified icons to this directory.
+
+# Colours
+
+$blue:   5485F3
+$yellow: F8AC30
+$red:    B00000
+$green:  03AE03
+$purple: AF49FE
+
+# Icons
+
+# filename        font name       colour    icon name
+
+update-available  material        $yellow   cloud-download
+update-ok         material        $green    cloud-done
+
+docs              material        $blue     help
+help              material        $green    help
+issue             fontawesome     $yellow   bug
+log               fontawesome     $blue     history
+url               fontawesome     $blue     globe
+
+off               fontawesome     $red      circle-o
+on                fontawesome     $green    check-circle-o
+reload            fontawesome     $yellow   refresh

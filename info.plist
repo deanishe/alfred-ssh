@@ -8,6 +8,19 @@
 	<string>Internet</string>
 	<key>connections</key>
 	<dict>
+		<key>0601F1AD-5EA4-4E4E-8497-C1A1D8A348D2</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>68121A8A-C9BD-42A9-A014-799D3B3544F4</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
 		<key>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</key>
 		<array>
 			<dict>
@@ -57,11 +70,13 @@
 				<false/>
 			</dict>
 		</array>
-		<key>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</key>
+		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
+		<array/>
+		<key>68121A8A-C9BD-42A9-A014-799D3B3544F4</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>E8C38C50-6B44-4FA1-B74B-511A8939E773</string>
+				<string>A3CF9185-4D22-48D1-9515-851538E8D12B</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -70,8 +85,6 @@
 				<false/>
 			</dict>
 		</array>
-		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
-		<array/>
 		<key>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</key>
 		<array>
 			<dict>
@@ -109,17 +122,7 @@
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>C246528B-48CD-4C6B-A6AA-5B80BD18802C</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-			<dict>
-				<key>destinationuid</key>
-				<string>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</string>
+				<string>E8C38C50-6B44-4FA1-B74B-511A8939E773</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -141,11 +144,24 @@
 				<false/>
 			</dict>
 		</array>
+		<key>A3CF9185-4D22-48D1-9515-851538E8D12B</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>C894BA15-BCAC-4B78-9125-BCF338A5B1B0</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<true/>
+			</dict>
+		</array>
 		<key>A5A07BAF-5D27-4E64-BC61-717AC34E5153</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>D05BB3AC-1409-4983-B5B1-9E1395C538C1</string>
+				<string>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -167,11 +183,11 @@
 				<false/>
 			</dict>
 		</array>
-		<key>C246528B-48CD-4C6B-A6AA-5B80BD18802C</key>
+		<key>C894BA15-BCAC-4B78-9125-BCF338A5B1B0</key>
 		<array>
 			<dict>
 				<key>destinationuid</key>
-				<string>EC55D85A-7A17-4ACF-A406-B9F53CB22425</string>
+				<string>16D8FC6A-552A-44BE-8428-53838B00AF24</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -185,19 +201,6 @@
 			<dict>
 				<key>destinationuid</key>
 				<string>1A62410B-26D8-493D-B57F-599DC4A36FD1</string>
-				<key>modifiers</key>
-				<integer>0</integer>
-				<key>modifiersubtext</key>
-				<string></string>
-				<key>vitoclose</key>
-				<false/>
-			</dict>
-		</array>
-		<key>D05BB3AC-1409-4983-B5B1-9E1395C538C1</key>
-		<array>
-			<dict>
-				<key>destinationuid</key>
-				<string>C9ACEFF8-36DB-42A5-8FC1-95D9A77A7FBA</string>
 				<key>modifiers</key>
 				<integer>0</integer>
 				<key>modifiersubtext</key>
@@ -233,21 +236,176 @@
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>sshconf</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Loading settings…</string>
+				<key>script</key>
+				<string>./assh config "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>View &amp; alter SSH settings</string>
+				<key>title</key>
+				<string>SSH Configuration</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A3CF9185-4D22-48D1-9515-851538E8D12B</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>externaltriggerid</key>
-				<string>ssh</string>
+				<string>config</string>
 				<key>passinputasargument</key>
 				<true/>
 				<key>passvariables</key>
-				<true/>
+				<false/>
 				<key>workflowbundleid</key>
 				<string>self</string>
 			</dict>
 			<key>type</key>
 			<string>alfred.workflow.output.callexternaltrigger</string>
 			<key>uid</key>
-			<string>C9ACEFF8-36DB-42A5-8FC1-95D9A77A7FBA</string>
+			<string>16D8FC6A-552A-44BE-8428-53838B00AF24</string>
 			<key>version</key>
 			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>./assh toggle "$1"
+
+echo -n "$query"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>C894BA15-BCAC-4B78-9125-BCF338A5B1B0</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>triggerid</key>
+				<string>config</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.external</string>
+			<key>uid</key>
+			<string>0601F1AD-5EA4-4E4E-8497-C1A1D8A348D2</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argument</key>
+				<string>.
+/-------------- CONFIG ------------\
+query={query}
+variables={allvars}
+\-------------- CONFIG ------------/</string>
+				<key>cleardebuggertext</key>
+				<false/>
+				<key>processoutputs</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.debug</string>
+			<key>uid</key>
+			<string>68121A8A-C9BD-42A9-A014-799D3B3544F4</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>ssh</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Reading history…</string>
+				<key>script</key>
+				<string># Search all hosts
+./assh search "$1"
+</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>Open SSH Connection</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</string>
+			<key>version</key>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -308,17 +466,21 @@
 			<key>config</key>
 			<dict>
 				<key>argument</key>
-				<string>{query}</string>
-				<key>variables</key>
-				<dict>
-					<key>EXTERNAL_TRIGGER</key>
-					<string>1</string>
-				</dict>
+				<string>.
+/-------- SSH ---------\
+query="{query}"
+variables=
+{allvars}
+\-------- SSH ---------/</string>
+				<key>cleardebuggertext</key>
+				<false/>
+				<key>processoutputs</key>
+				<true/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.utility.argument</string>
+			<string>alfred.workflow.utility.debug</string>
 			<key>uid</key>
-			<string>D05BB3AC-1409-4983-B5B1-9E1395C538C1</string>
+			<string>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -340,55 +502,6 @@
 			<string>3AA31B78-5898-4B51-A25F-B970B140ECB1</string>
 			<key>version</key>
 			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>alfredfiltersresults</key>
-				<false/>
-				<key>alfredfiltersresultsmatchmode</key>
-				<integer>0</integer>
-				<key>argumenttrimmode</key>
-				<integer>0</integer>
-				<key>argumenttype</key>
-				<integer>1</integer>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>keyword</key>
-				<string>ssh</string>
-				<key>queuedelaycustom</key>
-				<integer>3</integer>
-				<key>queuedelayimmediatelyinitially</key>
-				<true/>
-				<key>queuedelaymode</key>
-				<integer>0</integer>
-				<key>queuemode</key>
-				<integer>1</integer>
-				<key>runningsubtext</key>
-				<string>Reading history…</string>
-				<key>script</key>
-				<string># Search all hosts
-./assh search "$1"
-</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>subtext</key>
-				<string></string>
-				<key>title</key>
-				<string>Open SSH Connection</string>
-				<key>type</key>
-				<integer>0</integer>
-				<key>withspace</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.scriptfilter</string>
-			<key>uid</key>
-			<string>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</string>
-			<key>version</key>
-			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -447,28 +560,6 @@
 			<string>4575A48A-57E5-4A98-AFD8-0F611206F38C</string>
 			<key>version</key>
 			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argument</key>
-				<string>.
-/-------- SSH ---------\
-query="{query}"
-variables=
-{allvars}
-\-------- SSH ---------/</string>
-				<key>cleardebuggertext</key>
-				<false/>
-				<key>processoutputs</key>
-				<true/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.utility.debug</string>
-			<key>uid</key>
-			<string>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</string>
-			<key>version</key>
-			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -553,65 +644,6 @@ echo -n "$query"</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>68</integer>
-				<key>script</key>
-				<string>on run argv
-	tell application "Alfred 3" to search "ssh " &amp; (first item of argv)
-end run</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>6</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>EC55D85A-7A17-4ACF-A406-B9F53CB22425</string>
-			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>inputstring</key>
-				<string>{var:EXTERNAL_TRIGGER}</string>
-				<key>matchcasesensitive</key>
-				<true/>
-				<key>matchmode</key>
-				<integer>1</integer>
-				<key>matchstring</key>
-				<string>1</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.utility.filter</string>
-			<key>uid</key>
-			<string>C246528B-48CD-4C6B-A6AA-5B80BD18802C</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argument</key>
-				<string>{var:query}</string>
-				<key>variables</key>
-				<dict/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.utility.argument</string>
-			<key>uid</key>
-			<string>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>externaltriggerid</key>
 				<string>ssh</string>
 				<key>passinputasargument</key>
@@ -631,19 +663,15 @@ end run</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>inputstring</key>
-				<string>{var:EXTERNAL_TRIGGER}</string>
-				<key>matchcasesensitive</key>
-				<true/>
-				<key>matchmode</key>
-				<integer>0</integer>
-				<key>matchstring</key>
-				<string>1</string>
+				<key>argument</key>
+				<string>{var:query}</string>
+				<key>variables</key>
+				<dict/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.utility.filter</string>
+			<string>alfred.workflow.utility.argument</string>
 			<key>uid</key>
-			<string>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</string>
+			<string>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -674,6 +702,13 @@ MOSH_CMD specifieds the path to the `mosh` executable. The default, "mosh", shou
 
 To disable mosh, delete the value for MOSH_CMD.
 
+The SSH_CMD performs a similar function for the default action (opening SSH connections).
+
+By default, the workflow generates an ssh://... URL and asks the system to open it (or passes it to the application specified in SSH_APP).
+
+If you set SSH_CMD, the workflow will instead generate an `ssh` command and run that in your Terminal app. This is slower, but
+will load your dotfiles.
+
 Set EXIT_ON_SUCCESS to 0 to prevent the terminal closing if the ping/mosh command exits cleanly.
 
 
@@ -689,9 +724,25 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>Show error message if open fails</string>
 			<key>xpos</key>
-			<integer>920</integer>
+			<integer>990</integer>
 			<key>ypos</key>
-			<integer>210</integer>
+			<integer>430</integer>
+		</dict>
+		<key>0601F1AD-5EA4-4E4E-8497-C1A1D8A348D2</key>
+		<dict>
+			<key>note</key>
+			<string>Workflow configuration</string>
+			<key>xpos</key>
+			<integer>50</integer>
+			<key>ypos</key>
+			<integer>50</integer>
+		</dict>
+		<key>16D8FC6A-552A-44BE-8428-53838B00AF24</key>
+		<dict>
+			<key>xpos</key>
+			<integer>750</integer>
+			<key>ypos</key>
+			<integer>50</integer>
 		</dict>
 		<key>1A62410B-26D8-493D-B57F-599DC4A36FD1</key>
 		<dict>
@@ -700,18 +751,18 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>Alternate Action: Run shell command (e.g. ping or mosh)</string>
 			<key>xpos</key>
-			<integer>730</integer>
+			<integer>800</integer>
 			<key>ypos</key>
-			<integer>430</integer>
+			<integer>650</integer>
 		</dict>
 		<key>24ECFCB6-4E68-46DA-83CC-AFB9A0397458</key>
 		<dict>
 			<key>note</key>
-			<string>List and filter known SSH connections</string>
+			<string>List and filter hosts</string>
 			<key>xpos</key>
-			<integer>200</integer>
+			<integer>270</integer>
 			<key>ypos</key>
-			<integer>210</integer>
+			<integer>250</integer>
 		</dict>
 		<key>3AA31B78-5898-4B51-A25F-B970B140ECB1</key>
 		<dict>
@@ -720,9 +771,9 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 			<key>note</key>
 			<string>User-entered host</string>
 			<key>xpos</key>
-			<integer>600</integer>
+			<integer>670</integer>
 			<key>ypos</key>
-			<integer>60</integer>
+			<integer>280</integer>
 		</dict>
 		<key>4575A48A-57E5-4A98-AFD8-0F611206F38C</key>
 		<dict>
@@ -733,20 +784,9 @@ The EXTERNAL_TRIGGER setting tells the workflow to re-open itself using the Exte
 
 Use SSH_APP and SFTP_APP workflow variables to change the application used</string>
 			<key>xpos</key>
-			<integer>730</integer>
+			<integer>800</integer>
 			<key>ypos</key>
-			<integer>210</integer>
-		</dict>
-		<key>4C8C4C70-0F15-4C08-8E71-27E886FFCB21</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>9</integer>
-			<key>note</key>
-			<string>External trigger is on</string>
-			<key>xpos</key>
-			<integer>840</integer>
-			<key>ypos</key>
-			<integer>890</integer>
+			<integer>430</integer>
 		</dict>
 		<key>52720D61-C3AC-4297-8393-48F4D888BBED</key>
 		<dict>
@@ -755,16 +795,23 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Remember connection in History (if there's a username)</string>
 			<key>xpos</key>
-			<integer>730</integer>
+			<integer>800</integer>
 			<key>ypos</key>
-			<integer>30</integer>
+			<integer>250</integer>
+		</dict>
+		<key>68121A8A-C9BD-42A9-A014-799D3B3544F4</key>
+		<dict>
+			<key>xpos</key>
+			<integer>240</integer>
+			<key>ypos</key>
+			<integer>80</integer>
 		</dict>
 		<key>6E47AB43-D8E5-4D28-A2E8-DD0AF9CEDED0</key>
 		<dict>
 			<key>xpos</key>
-			<integer>400</integer>
+			<integer>470</integer>
 			<key>ypos</key>
-			<integer>240</integer>
+			<integer>280</integer>
 		</dict>
 		<key>7278AB1E-91D9-4CB7-BF1E-71C29D2F7B60</key>
 		<dict>
@@ -773,9 +820,9 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Set {query} from workflow variable</string>
 			<key>xpos</key>
-			<integer>690</integer>
+			<integer>840</integer>
 			<key>ypos</key>
-			<integer>640</integer>
+			<integer>870</integer>
 		</dict>
 		<key>8B1647C7-3F08-49D7-9C04-4447395B6CF0</key>
 		<dict>
@@ -784,20 +831,27 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Is not shell command</string>
 			<key>xpos</key>
-			<integer>600</integer>
+			<integer>670</integer>
 			<key>ypos</key>
-			<integer>240</integer>
+			<integer>460</integer>
+		</dict>
+		<key>A3CF9185-4D22-48D1-9515-851538E8D12B</key>
+		<dict>
+			<key>note</key>
+			<string>View &amp; edit configuration</string>
+			<key>xpos</key>
+			<integer>360</integer>
+			<key>ypos</key>
+			<integer>50</integer>
 		</dict>
 		<key>A5A07BAF-5D27-4E64-BC61-717AC34E5153</key>
 		<dict>
-			<key>colorindex</key>
-			<integer>3</integer>
 			<key>note</key>
 			<string>Run workflow</string>
 			<key>xpos</key>
-			<integer>30</integer>
+			<integer>50</integer>
 			<key>ypos</key>
-			<integer>30</integer>
+			<integer>250</integer>
 		</dict>
 		<key>BEDA7962-222B-4001-8A98-6EB2B78342AD</key>
 		<dict>
@@ -806,31 +860,18 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Alternate Action: Forget connection from History</string>
 			<key>xpos</key>
-			<integer>500</integer>
+			<integer>630</integer>
 			<key>ypos</key>
-			<integer>610</integer>
-		</dict>
-		<key>C246528B-48CD-4C6B-A6AA-5B80BD18802C</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>10</integer>
-			<key>note</key>
-			<string>External trigger is off</string>
-			<key>xpos</key>
 			<integer>840</integer>
-			<key>ypos</key>
-			<integer>640</integer>
 		</dict>
-		<key>C9ACEFF8-36DB-42A5-8FC1-95D9A77A7FBA</key>
+		<key>C894BA15-BCAC-4B78-9125-BCF338A5B1B0</key>
 		<dict>
-			<key>colorindex</key>
-			<integer>3</integer>
 			<key>note</key>
-			<string>Call ssh External Trigger below</string>
+			<string>Toggle setting on/off</string>
 			<key>xpos</key>
-			<integer>360</integer>
+			<integer>560</integer>
 			<key>ypos</key>
-			<integer>30</integer>
+			<integer>50</integer>
 		</dict>
 		<key>D02E857F-D8BD-4AE5-8764-71CFF97757CA</key>
 		<dict>
@@ -839,55 +880,31 @@ Use SSH_APP and SFTP_APP workflow variables to change the application used</stri
 			<key>note</key>
 			<string>Is shell command</string>
 			<key>xpos</key>
-			<integer>600</integer>
+			<integer>670</integer>
 			<key>ypos</key>
-			<integer>460</integer>
-		</dict>
-		<key>D05BB3AC-1409-4983-B5B1-9E1395C538C1</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>3</integer>
-			<key>note</key>
-			<string>Turn on External Trigger mode</string>
-			<key>xpos</key>
-			<integer>240</integer>
-			<key>ypos</key>
-			<integer>60</integer>
+			<integer>680</integer>
 		</dict>
 		<key>E8C38C50-6B44-4FA1-B74B-511A8939E773</key>
 		<dict>
 			<key>colorindex</key>
-			<integer>9</integer>
+			<integer>10</integer>
 			<key>note</key>
 			<string>Re-open Alfred with previous query (External Trigger).
 
 Disabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to enable.</string>
 			<key>xpos</key>
-			<integer>940</integer>
+			<integer>990</integer>
 			<key>ypos</key>
-			<integer>860</integer>
-		</dict>
-		<key>EC55D85A-7A17-4ACF-A406-B9F53CB22425</key>
-		<dict>
-			<key>colorindex</key>
-			<integer>10</integer>
-			<key>note</key>
-			<string>Re-open Alfred with previous query (Direct Call).
-
-Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable.</string>
-			<key>xpos</key>
-			<integer>940</integer>
-			<key>ypos</key>
-			<integer>610</integer>
+			<integer>840</integer>
 		</dict>
 		<key>F6FCC74B-9EC0-47A6-8C0D-B445AD7C9722</key>
 		<dict>
 			<key>note</key>
-			<string>Used (optionally) to re-open workflow after deleting a connection from History.</string>
+			<string>List and filter hosts</string>
 			<key>xpos</key>
-			<integer>30</integer>
+			<integer>50</integer>
 			<key>ypos</key>
-			<integer>210</integer>
+			<integer>430</integer>
 		</dict>
 	</dict>
 	<key>variables</key>
@@ -904,17 +921,19 @@ Enabled by default. Set EXTERNAL_TRIGGER=1 in the Configuration Sheet to disable
 		<string>0</string>
 		<key>EXIT_ON_SUCCESS</key>
 		<string>1</string>
-		<key>EXTERNAL_TRIGGER</key>
-		<string>0</string>
 		<key>MOSH_CMD</key>
 		<string>mosh</string>
 		<key>SFTP_APP</key>
 		<string></string>
 		<key>SSH_APP</key>
 		<string></string>
+		<key>SSH_CMD</key>
+		<string></string>
 	</dict>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>version</key>
-	<string>0.7.2</string>
+	<string>0.8.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/deanishe/alfred-ssh</string>
 </dict>

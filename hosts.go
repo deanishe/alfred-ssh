@@ -34,6 +34,7 @@ type Host interface {
 	CanonicalURL() *url.URL     // Canonical SSH URL
 	SSHURL() *url.URL           // ssh:// URL for this host
 	SFTPURL() *url.URL          // sftp:// URL for this host
+	SSHCmd(path string) string  // Command-line ssh command for this host
 	MoshCmd(path string) string // Command-line mosh command for this host
 }
 
@@ -226,6 +227,22 @@ func (h *BaseHost) MoshCmd(path string) string {
 	cmd := path + " "
 	if h.Port() != 22 {
 		cmd += fmt.Sprintf("--ssh 'ssh -p %d' ", h.Port())
+	}
+	if h.Username() != "" {
+		cmd += h.Username() + "@"
+	}
+	cmd += h.Hostname()
+	return cmd
+}
+
+// SSHCmd implements Host.
+func (h *BaseHost) SSHCmd(path string) string {
+	if path == "" {
+		path = "ssh"
+	}
+	cmd := path + " "
+	if h.Port() != 22 {
+		cmd += fmt.Sprintf("-p %d ", h.Port())
 	}
 	if h.Username() != "" {
 		cmd += h.Username() + "@"

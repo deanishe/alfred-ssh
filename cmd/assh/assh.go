@@ -40,11 +40,16 @@ import (
 	"github.com/docopt/docopt-go"
 )
 
-// Name of background job that checks for updates
-const updateJobName = "checkForUpdate"
-
-// GitHub repo
-const repo = "deanishe/alfred-ssh"
+const (
+	// Name of background job that checks for updates
+	updateJobName = "checkForUpdate"
+	// GitHub repo
+	repo = "deanishe/alfred-ssh"
+	// Doc & help URLs
+	docsURL  = "https://github.com/deanishe/alfred-ssh/blob/master/README.md"
+	issueURL = "https://github.com/deanishe/alfred-ssh/issues"
+	forumURL = "https://www.alfredforum.com/topic/8956-secure-shell-for-alfred-3-ssh-plus-sftp-mosh-ping-with-autosuggest/"
+)
 
 // Paths to built-in sources
 var (
@@ -64,10 +69,24 @@ var (
 	PriorityEtcHosts     = 5
 )
 
+// Workflow icons
 var (
-	iconUpdate = &aw.Icon{Value: "update.png"}
-	minScore   = 30.0 // Default cut-off for search results
-	usage      = `assh [options] [<query>]
+	IconWorkflow        = &aw.Icon{Value: "icon.png"}
+	IconConfig          = &aw.Icon{Value: "icons/config.png"}
+	IconDocs            = &aw.Icon{Value: "icons/docs.png"}
+	IconHelp            = &aw.Icon{Value: "icons/help.png"}
+	IconIssue           = &aw.Icon{Value: "icons/issue.png"}
+	IconUpdateAvailable = &aw.Icon{Value: "icons/update-available.png"}
+	IconUpdateOK        = &aw.Icon{Value: "icons/update-ok.png"}
+	IconURL             = &aw.Icon{Value: "icons/url.png"}
+	IconOn              = &aw.Icon{Value: "icons/on.png"}
+	IconOff             = &aw.Icon{Value: "icons/off.png"}
+	IconLog             = &aw.Icon{Value: "icons/log.png"}
+)
+
+var (
+	minScore = 30.0 // Default cut-off for search results
+	usage    = `assh [options] [<query>]
 
 Display a list of know SSH hosts in Alfred 3. If <query>
 is specified, the hostnames will be filtered against it.
@@ -79,6 +98,8 @@ Usage:
     assh forget <url>
     assh print (datadir|cachedir|distname|logfile)
     assh check
+	assh config [<query>]
+	assh toggle <var>
     assh --help|--version
 
 Options:
@@ -90,18 +111,25 @@ Options:
                       mode can also turned on by setting the
                       environment variable DEMO_MODE=1
 `
-	// wfopts *aw.Options
-	// sopts  *aw.SortOptions
-	sopts  []fuzzy.Option
-	wfopts []aw.Option
-	wf     *aw.Workflow
+	wf *aw.Workflow
 )
 
 func init() {
-	// sopts = aw.NewSortOptions()
-	sopts = append(sopts, fuzzy.SeparatorBonus(10.0))
-	wf = aw.New(aw.SortOptions(sopts...), update.GitHub(repo))
+	wf = aw.New(
+		aw.SortOptions(
+			fuzzy.SeparatorBonus(10.0),
+		),
+		aw.AddMagic(
+			urlMagic{"docs", "Open workflow documentation in your browser", docsURL},
+			urlMagic{"forum", "Visit the workflow thread on alfredforum.com", forumURL},
+		),
+		update.GitHub(repo),
+		aw.HelpURL(issueURL),
+	)
 }
+
+// main calls run() via Workflow.Run().
+func main() { wf.Run(run) }
 
 // Hosts is a collection of Host objects that supports aw.Sortable.
 // (and therefore sort.Interface).
@@ -120,97 +148,101 @@ func (s Hosts) SortKey(i int) string { return s[i].Name() }
 // --------------------------------------------------------------------
 
 type options struct {
-	checkForUpdate bool     // Download list of available releases
-	forget         bool     // Whether to forget URL
-	open           bool     // Whether to open URL
-	print          bool     // Whether to print a variable
-	remember       bool     // Whether to remember URL
-	printVar       string   // Set to print the corresponding variable
-	query          string   // User query. User input is parsed into query and username
-	rawInput       string   // The full, unparsed query
-	historyPath    string   // Path to history cache file
-	url            *url.URL // URL to add to history
-	username       string   // SSH username. Added later by query parser.
-	port           int      // SSH port. Added later by query parser.
-	useTestData    bool     // Whether to load test data instead of user data
-	exitOnSuccess  bool     // Append && exit to shell commands
+	// Command-line options
+	Check         bool   // Download list of available releases
+	Config        bool   // Whether to show configuration options
+	Demo          bool   `env:"DEMO_MODE"` // Whether to load test data instead of user data
+	Forget        bool   // Whether to forget URL
+	Open          bool   // Whether to open URL
+	Print         bool   // Whether to print a variable
+	PrintDataDir  bool   `docopt:"datadir"`
+	PrintCacheDir bool   `docopt:"cachedir"`
+	PrintDistName bool   `docopt:"distname"`
+	PrintLogFile  bool   `docopt:"logfile"`
+	Remember      bool   // Whether to remember URL
+	Search        bool   // Whether to search hosts
+	Toggle        bool   // Whether to toggle a setting on/off
+	RawInput      string `docopt:"<query>"` // The full, unparsed query
+	RawURL        string `docopt:"<url>"`   // Input URL
+	VarName       string `docopt:"<var>"`   // Name of variable to toggle
+
+	// Workflow configuration (environment variables)
+	DisableConfig     bool
+	DisableEtcConfig  bool
+	DisableEtcHosts   bool
+	DisableHistory    bool
+	DisableKnownHosts bool
+	ExitOnSuccess     bool // Append " && exit" to shell commands
+	MoshCmd           string
+	SFTPApp           string `env:"SFTP_APP"`
+	SSHApp            string `env:"SSH_APP"`
+	SSHCmd            string `env:"SSH_CMD"`
+
+	// Derived configuration
+	query       string   // User query. User input is parsed into query and username
+	url         *url.URL // URL to add to history
+	username    string   // SSH username. Added later by query parser.
+	port        int      // SSH port. Added later by query parser.
+	historyPath string   // Path to history cache file
 }
 
-// runOptions constructs the program options from command-line arguments and
-// environment variables.
-func runOptions() *options {
+// MagicAction that opens a given URL.
+type urlMagic struct {
+	keyword     string
+	description string
+	URL         string
+}
 
-	o := &options{}
+func (ma urlMagic) Keyword() string     { return ma.keyword }
+func (ma urlMagic) Description() string { return ma.description }
+func (ma urlMagic) RunText() string     { return fmt.Sprintf("Opening %s ...", ma.URL) }
+func (ma urlMagic) Run() error {
+	cmd := exec.Command("/usr/bin/open", ma.URL)
+	_, err := util.RunCmd(cmd)
+	return err
+}
+
+// parseArgs constructs the program options from command-line arguments and
+// environment variables.
+func parseArgs() *options {
+
+	var (
+		o    = &options{}
+		vstr = fmt.Sprintf("%s/%v (awgo/%v)", wf.Name(), wf.Version(), aw.AwGoVersion)
+		err  error
+	)
 
 	// Parse options --------------------------------------------------
-	vstr := fmt.Sprintf("%s/%v (awgo/%v)", wf.Name(),
-		wf.Version(), aw.AwGoVersion)
 
-	args, err := docopt.Parse(usage, wf.Args(), true, vstr, false)
+	args, err := docopt.ParseArgs(usage, wf.Args(), vstr)
 	if err != nil {
-		panic(fmt.Sprintf("Error parsing CLI options : %v", err))
-	}
-	// log.Printf("args=%+v", args)
-
-	// Alternate Actions
-	if args["check"] == true {
-		o.checkForUpdate = true
-	}
-	if args["remember"] == true {
-		o.remember = true
-	}
-	if args["forget"] == true {
-		o.forget = true
-	}
-	if args["open"] == true {
-		o.open = true
-	}
-	if args["print"] == true {
-		o.print = true
+		panic(fmt.Sprintf("Error parsing CLI options: %v", err))
 	}
 
-	if args["<url>"] != nil {
-		if s, ok := args["<url>"].(string); ok {
-			o.url, err = url.Parse(s)
-			if err != nil || !o.url.IsAbs() {
-				wf.Fatalf("Invalid URL: %s", s)
-			}
-		} else {
-			wf.Fatal("Can't convert <url> to string.")
+	if err = args.Bind(o); err != nil {
+		panic(fmt.Sprintf("Error parsing CLI options: %v", err))
+	}
+
+	if err = wf.Alfred.To(o); err != nil {
+		panic(fmt.Sprintf("Error loading workflow configuration: %v", err))
+	}
+
+	if o.RawURL != "" {
+		o.url, err = url.Parse(o.RawURL)
+		if err != nil || !o.url.IsAbs() {
+			wf.Fatalf("Invalid URL: %s", o.RawURL)
 		}
 	}
 
-	if o.print {
-		if args["datadir"] == true {
-			o.printVar = "data"
-		} else if args["cachedir"] == true {
-			o.printVar = "cache"
-		} else if args["logfile"] == true {
-			o.printVar = "log"
-		} else if args["distname"] == true {
-			o.printVar = "dist"
-		}
-	}
-
-	if args["--demo"] == true || optionSet("DEMO_MODE") {
-		o.useTestData = true
+	if o.Demo {
 		o.historyPath = filepath.Join(wf.DataDir(), "history.test.json")
 	} else {
 		o.historyPath = filepath.Join(wf.DataDir(), "history.json")
 	}
 
-	if args["<query>"] != nil {
-		if s, ok := args["<query>"].(string); ok {
-			s = strings.TrimSpace(s)
-			o.query = s
-			o.rawInput = s
-		} else {
-			wf.Fatal("Can't convert query to string.")
-		}
-	}
-
-	if optionSet("EXIT_ON_SUCCESS") {
-		o.exitOnSuccess = true
+	if o.RawInput != "" {
+		o.RawInput = strings.TrimSpace(o.RawInput)
+		o.query = o.RawInput
 	}
 
 	return o
@@ -218,23 +250,20 @@ func runOptions() *options {
 
 // Print a variable to STDOUT
 func runPrint(o *options) {
-	if o.printVar == "data" {
 
+	if o.PrintDataDir {
 		fmt.Print(wf.DataDir())
 		return
 
-	} else if o.printVar == "cache" {
-
+	} else if o.PrintCacheDir {
 		fmt.Print(wf.CacheDir())
 		return
 
-	} else if o.printVar == "log" {
-
+	} else if o.PrintLogFile {
 		fmt.Print(wf.LogFile())
 		return
 
-	} else if o.printVar == "dist" {
-
+	} else if o.PrintDistName {
 		name := strings.Replace(
 			fmt.Sprintf("%s-%s.alfredworkflow", wf.Name(), wf.Version()),
 			" ", "-", -1)
@@ -289,7 +318,8 @@ func runUpdate(o *options) {
 
 // Add host or remove host from history
 func runHistory(o *options) {
-	if os.Getenv("DISABLE_HISTORY") == "1" {
+
+	if o.DisableHistory {
 		log.Println("History disabled. Ignoring.")
 		return
 	}
@@ -301,7 +331,8 @@ func runHistory(o *options) {
 	}
 
 	host := ssh.NewBaseHostFromURL(o.url)
-	if o.remember { // Add URL to history
+
+	if o.Remember { // Add URL to history
 		if err := h.Add(host); err != nil {
 			log.Printf("Error adding host %v : %v", host, err)
 			panic(err)
@@ -314,14 +345,111 @@ func runHistory(o *options) {
 		}
 		log.Printf("Removed '%s' from history", host.Name())
 	}
+
 	h.Save()
 	return
 }
 
+// Alfred Script Filter to view configuration
+func runConfig(o *options) {
+
+	sources := []struct {
+		title, file, varName string
+		disabled             bool
+	}{
+		{"SSH Config", "~/.ssh/config", "DISABLE_CONFIG", o.DisableConfig},
+		{"SSH Config (system)", "/etc/ssh/ssh_config", "DISABLE_ETC_CONFIG", o.DisableEtcConfig},
+		{"/etc/hosts", "/etc/hosts", "DISABLE_ETC_HOSTS", o.DisableEtcHosts},
+		{"History", "workflow history", "DISABLE_HISTORY", o.DisableHistory},
+		{"Known Hosts", "~/.ssh/known_hosts", "DISABLE_KNOWN_HOSTS", o.DisableKnownHosts},
+	}
+
+	wf.Var("query", o.query)
+
+	if wf.UpdateAvailable() {
+		wf.NewItem("An Update is Available!").
+			Subtitle("↩ or ⇥ to install").
+			Autocomplete("workflow:update").
+			Icon(IconUpdateAvailable).
+			Valid(false)
+	} else {
+		wf.NewItem("Workflow is Up To Date").
+			Subtitle("↩ or ⇥ to check for update now").
+			Autocomplete("workflow:update").
+			Icon(IconUpdateOK).
+			Valid(false)
+	}
+
+	for _, src := range sources {
+
+		icon := IconOn
+		if src.disabled {
+			icon = IconOff
+		}
+
+		wf.NewItem("Source: " + src.title).
+			Subtitle(src.file).
+			Arg(src.varName).
+			Valid(true).
+			Icon(icon)
+
+	}
+
+	wf.NewItem("Log File").
+		Subtitle("Open workflow log file").
+		Autocomplete("workflow:log").
+		Icon(IconLog)
+
+	// Docs & help URLs
+	wf.NewItem("Documentation").
+		Subtitle("Read the workflow docs in your browser").
+		Autocomplete("workflow:docs").
+		Icon(IconDocs)
+
+	wf.NewItem("Report Issue").
+		Subtitle("Open the workflow's issue tracker on GitHub").
+		Autocomplete("workflow:help").
+		Icon(IconIssue)
+
+	wf.NewItem("Visit Forum").
+		Subtitle("Open the workflow's thread on alfredforum.com").
+		Autocomplete("workflow:forum").
+		Icon(IconURL)
+
+	if o.query != "" {
+		wf.Filter(o.query)
+	}
+
+	wf.WarnEmpty("No matches found", "Try a different query?")
+	wf.SendFeedback()
+}
+
+// Toggle a setting on/off
+func runToggle(o *options) {
+
+	wf.Configure(aw.TextErrors(true))
+
+	var s = "1"
+
+	if wf.Alfred.GetBool(o.VarName) {
+		s = "0"
+	}
+
+	log.Printf("[toggle] %s ->  %q", o.VarName, s)
+
+	if err := wf.Alfred.SetConfig(o.VarName, s, true).Do(); err != nil {
+		wf.FatalError(err)
+	}
+
+}
+
 // Alfred Script Filter to search hosts
 func runSearch(o *options) {
-	var hosts Hosts
-	var host ssh.Host
+
+	var (
+		hosts Hosts
+		host  ssh.Host
+	)
 
 	// Parse query ----------------------------------------------------
 	// Extract username if present
@@ -341,12 +469,15 @@ func runSearch(o *options) {
 
 	// Show update status if there's no query
 	if o.query == "" && wf.UpdateAvailable() {
-		// noUIDs = true
-		wf.NewItem("An update is available!").
+
+		// Ensure update notification is top results
+		wf.Configure(aw.SuppressUIDs(true))
+
+		wf.NewItem("An Update is Available!").
 			Subtitle("↩ or ⇥ to install").
 			Valid(false).
 			Autocomplete("workflow:update").
-			Icon(iconUpdate)
+			Icon(IconUpdateAvailable)
 	}
 
 	// Load hosts from sources ----------------------------------------
@@ -385,7 +516,7 @@ func runSearch(o *options) {
 
 		// Add Host for query if it makes sense
 		if ssh.IsValidHostname(o.query) {
-			host = ssh.NewBaseHost(o.rawInput, o.query, "user input", o.username, o.port)
+			host = ssh.NewBaseHost(o.RawInput, o.query, "user input", o.username, o.port)
 			if !d.IsDuplicate(host) {
 				itemForHost(host, o)
 			}
@@ -401,10 +532,11 @@ func runSearch(o *options) {
 
 // run executes the workflow. Calls other run* functions based on command-line options.
 func run() {
-	o := runOptions()
-	// log.Printf("options=%+v", o)
 
-	if o.checkForUpdate {
+	o := parseArgs()
+	log.Printf("options=\n%+v\n", o)
+
+	if o.Check {
 		runUpdate(o)
 		return
 	}
@@ -418,14 +550,20 @@ func run() {
 		}
 	}
 
-	if o.print {
+	if o.Print {
 		runPrint(o)
 		return
-	} else if o.open {
+	} else if o.Open {
 		runOpen(o)
 		return
-	} else if o.remember || o.forget {
+	} else if o.Remember || o.Forget {
 		runHistory(o)
+		return
+	} else if o.Toggle {
+		runToggle(o)
+		return
+	} else if o.Config {
+		runConfig(o)
 		return
 	}
 	runSearch(o)
@@ -465,17 +603,30 @@ func itemForHost(host ssh.Host, o *options) *aw.Item {
 		Largetype(host.CanonicalURL().String()).
 		UID(uid).
 		Valid(true).
-		Icon(&aw.Icon{Value: "icon.png"}).
+		Icon(IconWorkflow).
 		Match(key)
 
 	// Variables
-	it.Var("query", o.rawInput).
+	it.Var("query", o.RawInput).
 		Var("name", host.Name()).
 		Var("hostname", host.Hostname()).
 		Var("source", host.Source()).
 		Var("port", fmt.Sprintf("%d", host.Port())).
 		Var("shell_cmd", "0").
 		Var("url", url)
+
+	// Send ssh command via Terminal Command instead of opening URL
+	if os.Getenv("SSH_CMD") != "" {
+		cmd = host.SSHCmd(os.Getenv("SSH_CMD"))
+		if cmd != "" {
+			if o.ExitOnSuccess {
+				cmd += " && exit"
+			}
+			it.Arg(cmd)
+			it.Subtitle(fmt.Sprintf("%s (from %s)", cmd, host.Source()))
+			it.Var("shell_cmd", "1")
+		}
+	}
 
 	// Modifiers
 
@@ -489,7 +640,7 @@ func itemForHost(host ssh.Host, o *options) *aw.Item {
 	if os.Getenv("MOSH_CMD") != "" {
 		cmd = host.MoshCmd(os.Getenv("MOSH_CMD"))
 		if cmd != "" {
-			if o.exitOnSuccess {
+			if o.ExitOnSuccess {
 				cmd += " && exit"
 			}
 			it.NewModifier("alt").
@@ -501,7 +652,7 @@ func itemForHost(host ssh.Host, o *options) *aw.Item {
 
 	// Ping host
 	cmd = "ping " + host.Hostname()
-	if o.exitOnSuccess {
+	if o.ExitOnSuccess {
 		cmd += " && exit"
 	}
 	it.NewModifier("shift").
@@ -524,7 +675,7 @@ func loadHosts(o *options) []ssh.Host {
 	var start = time.Now()
 	var hosts Hosts
 
-	if o.useTestData {
+	if o.Demo {
 		log.Println("**** Using test data ****")
 		hosts = append(hosts, ssh.TestHosts()...)
 		return hosts
@@ -532,32 +683,33 @@ func loadHosts(o *options) []ssh.Host {
 
 	sources := ssh.Sources{}
 
-	if !optionSet("DISABLE_HISTORY") {
+	if !o.DisableHistory {
 		sources = append(sources, ssh.NewHistory(o.historyPath, "history", PriorityHistory))
 		// log.Printf("[source/new/history] %s", aw.ShortenPath(o.historyPath))
 	}
-	if !optionSet("DISABLE_ETC_HOSTS") {
+	if !o.DisableEtcHosts {
 		sources = append(sources, ssh.NewHostsSource(EtcHostsPath, "/etc/hosts", PriorityEtcHosts))
 		// log.Printf("[source/new/hosts] %s", EtcHostsPath)
 	}
-	if !optionSet("DISABLE_KNOWN_HOSTS") {
+	if !o.DisableKnownHosts {
 		sources = append(sources, ssh.NewKnownSource(SSHKnownHostsPath, "known_hosts", PriorityKnownHosts))
 		// log.Printf("[source/new/known_hosts] %s", aw.ShortenPath(SSHKnownHostsPath))
 	}
-	if !optionSet("DISABLE_CONFIG") {
+	if !o.DisableConfig {
 		sources = append(sources, ssh.NewConfigSource(SSHUserConfigPath, "~/.ssh/config", PriorityUserConfig))
 		// log.Printf("[source/new/config] %s", aw.ShortenPath(SSHUserConfigPath))
 	}
-	if !optionSet("DISABLE_ETC_CONFIG") {
+	if !o.DisableEtcConfig {
 		sources = append(sources, ssh.NewConfigSource(SSHGlobalConfigPath, "/etc/ssh", PriorityGlobalConfig))
 		// log.Printf("[source/new/config] %s", SSHGlobalConfigPath)
 	}
 	hosts = append(hosts, sources.Hosts()...)
 
-	log.Printf("%d host(s) loaded in %s", len(hosts), util.HumanDuration(time.Since(start)))
+	log.Printf("%d host(s) loaded in %s", len(hosts), time.Since(start))
 	return hosts
 }
 
+/*
 // optionSet returns true if environment variable key is set to 1, Y, yes etc.
 func optionSet(key string) bool {
 	v := strings.ToLower(os.Getenv(key))
@@ -569,8 +721,4 @@ func optionSet(key string) bool {
 	}
 	return false
 }
-
-// main calls run() via Workflow.Run().
-func main() {
-	wf.Run(run)
-}
+*/
