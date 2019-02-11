@@ -31,13 +31,13 @@ import (
 
 	"os/exec"
 
-	"github.com/deanishe/alfred-ssh"
-	"github.com/deanishe/awgo"
+	ssh "github.com/deanishe/alfred-ssh"
+	aw "github.com/deanishe/awgo"
 	"github.com/deanishe/awgo/fuzzy"
 	"github.com/deanishe/awgo/update"
 	"github.com/deanishe/awgo/util"
 
-	"github.com/docopt/docopt-go"
+	docopt "github.com/docopt/docopt-go"
 )
 
 const (
@@ -46,9 +46,9 @@ const (
 	// GitHub repo
 	repo = "deanishe/alfred-ssh"
 	// Doc & help URLs
-	docsURL  = "https://github.com/deanishe/alfred-ssh/blob/master/README.md"
 	issueURL = "https://github.com/deanishe/alfred-ssh/issues"
 	forumURL = "https://www.alfredforum.com/topic/8956-secure-shell-for-alfred-3-ssh-plus-sftp-mosh-ping-with-autosuggest/"
+	helpPath = "./README.html"
 )
 
 // Paths to built-in sources
@@ -71,17 +71,19 @@ var (
 
 // Workflow icons
 var (
-	IconWorkflow        = &aw.Icon{Value: "icon.png"}
-	IconConfig          = &aw.Icon{Value: "icons/config.png"}
 	IconDocs            = &aw.Icon{Value: "icons/docs.png"}
 	IconHelp            = &aw.Icon{Value: "icons/help.png"}
 	IconIssue           = &aw.Icon{Value: "icons/issue.png"}
+	IconLog             = &aw.Icon{Value: "icons/log.png"}
+	IconOff             = &aw.Icon{Value: "icons/off.png"}
+	IconOn              = &aw.Icon{Value: "icons/on.png"}
+	IconReload          = &aw.Icon{Value: "icons/reload.png"}
+	IconSettings        = &aw.Icon{Value: "icons/settings.png"}
+	IconURL             = &aw.Icon{Value: "icons/url.png"}
 	IconUpdateAvailable = &aw.Icon{Value: "icons/update-available.png"}
 	IconUpdateOK        = &aw.Icon{Value: "icons/update-ok.png"}
-	IconURL             = &aw.Icon{Value: "icons/url.png"}
-	IconOn              = &aw.Icon{Value: "icons/on.png"}
-	IconOff             = &aw.Icon{Value: "icons/off.png"}
-	IconLog             = &aw.Icon{Value: "icons/log.png"}
+	IconWarning         = &aw.Icon{Value: "icons/warning.png"}
+	IconWorkflow        = &aw.Icon{Value: "icon.png"}
 )
 
 var (
@@ -120,8 +122,8 @@ func init() {
 			fuzzy.SeparatorBonus(10.0),
 		),
 		aw.AddMagic(
-			urlMagic{"docs", "Open workflow documentation in your browser", docsURL},
-			urlMagic{"forum", "Visit the workflow thread on alfredforum.com", forumURL},
+			openMagic{"docs", "Open workflow documentation in your browser", helpPath},
+			openMagic{"forum", "Visit the workflow thread on alfredforum.com", forumURL},
 		),
 		update.GitHub(repo),
 		aw.HelpURL(issueURL),
@@ -186,18 +188,19 @@ type options struct {
 	historyPath string   // Path to history cache file
 }
 
-// MagicAction that opens a given URL.
-type urlMagic struct {
+// MagicAction that opens a given path or URL.
+type openMagic struct {
 	keyword     string
 	description string
-	URL         string
+	target      string
 }
 
-func (ma urlMagic) Keyword() string     { return ma.keyword }
-func (ma urlMagic) Description() string { return ma.description }
-func (ma urlMagic) RunText() string     { return fmt.Sprintf("Opening %s ...", ma.URL) }
-func (ma urlMagic) Run() error {
-	cmd := exec.Command("/usr/bin/open", ma.URL)
+func (ma openMagic) Keyword() string     { return ma.keyword }
+func (ma openMagic) Description() string { return ma.description }
+func (ma openMagic) RunText() string     { return fmt.Sprintf("Opening %s ...", ma.target) }
+func (ma openMagic) Run() error {
+	log.Printf("[magic] opening %q in default application ...", ma.target)
+	cmd := exec.Command("/usr/bin/open", ma.target)
 	_, err := util.RunCmd(cmd)
 	return err
 }
@@ -351,20 +354,21 @@ func runHistory(o *options) {
 }
 
 // Alfred Script Filter to view configuration
-func runConfig(o *options) {
+func runConfig(opts *options) {
 
 	sources := []struct {
 		title, file, varName string
 		disabled             bool
 	}{
-		{"SSH Config", "~/.ssh/config", "DISABLE_CONFIG", o.DisableConfig},
-		{"SSH Config (system)", "/etc/ssh/ssh_config", "DISABLE_ETC_CONFIG", o.DisableEtcConfig},
-		{"/etc/hosts", "/etc/hosts", "DISABLE_ETC_HOSTS", o.DisableEtcHosts},
-		{"History", "workflow history", "DISABLE_HISTORY", o.DisableHistory},
-		{"Known Hosts", "~/.ssh/known_hosts", "DISABLE_KNOWN_HOSTS", o.DisableKnownHosts},
+		{"SSH Config", "~/.ssh/config", "DISABLE_CONFIG", opts.DisableConfig},
+		{"SSH Config (system)", "/etc/ssh/ssh_config",
+			"DISABLE_ETC_CONFIG", opts.DisableEtcConfig},
+		{"/etc/hosts", "/etc/hosts", "DISABLE_ETC_HOSTS", opts.DisableEtcHosts},
+		{"History", "workflow history", "DISABLE_HISTORY", opts.DisableHistory},
+		{"Known Hosts", "~/.ssh/known_hosts", "DISABLE_KNOWN_HOSTS", opts.DisableKnownHosts},
 	}
 
-	wf.Var("query", o.query)
+	wf.Var("query", opts.query)
 
 	if wf.UpdateAvailable() {
 		wf.NewItem("An Update is Available!").
@@ -416,8 +420,8 @@ func runConfig(o *options) {
 		Autocomplete("workflow:forum").
 		Icon(IconURL)
 
-	if o.query != "" {
-		wf.Filter(o.query)
+	if opts.query != "" {
+		wf.Filter(opts.query)
 	}
 
 	wf.WarnEmpty("No matches found", "Try a different query?")

@@ -3,7 +3,7 @@
 /build
 /dist
 
-# Vendoring
-/vendor/*
-Gopkg.lock
+# Vim turds
+/tags
+*.swp
 
