@@ -1,5 +1,7 @@
 github.com/bmatcuk/doublestar v1.1.1 h1:YroD6BJCZBYx06yYFEWvUuKVWQn3vLLQAVmDmvTSaiQ=
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
+github.com/bmatcuk/doublestar v1.1.2 h1:p0ybUUk/Dh+yetkg3v0Yhi/ujMiet/gztYQnxNXfsyw=
+github.com/bmatcuk/doublestar v1.1.2/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
 github.com/deanishe/awgo v0.0.0-20180309103452-75d41ab66a78 h1:Z0oWu3pvFO3hByBx6/g3QAOrJM6rRHHaVxpCPbdjGlg=
 github.com/deanishe/awgo v0.0.0-20180309103452-75d41ab66a78/go.mod h1:iS04UkOlaot9B69n8pPeXb804n4vxgDGl3QjXybu4nM=
 github.com/disintegration/imaging v1.6.0 h1:nVPXRUUQ36Z7MNf0O77UzgnOb1mkMMor7lmJMJXc/mA=

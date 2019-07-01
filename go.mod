@@ -1,7 +1,7 @@
 module github.com/deanishe/alfred-ssh
 
 require (
-	github.com/bmatcuk/doublestar v1.1.1
+	github.com/bmatcuk/doublestar v1.1.2
 	github.com/deanishe/awgo v0.0.0-20180309103452-75d41ab66a78
 	github.com/disintegration/imaging v1.6.0
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
