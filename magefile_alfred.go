@@ -6,7 +6,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -16,21 +15,26 @@ import (
 )
 
 var (
-	alfredPrefsPath   = os.ExpandEnv("${HOME}/Library/Preferences/com.runningwithcrayons.Alfred-Preferences-3.plist")
-	defaultSyncFolder = os.ExpandEnv("~/Library/Application Support/Alfred 3")
+	// Home    = os.ExpandEnv("$HOME")
+	Library = os.ExpandEnv("$HOME/Library")
 
+	// Workflow configuration
 	// Read from info.plist
 	BundleID string
 	Version  string
 	Name     string
 
+	PrefsFile   string
+	SyncFolder  string
 	DataDir     string
 	CacheDir    string
 	WorkflowDir string
+	AppVersion  string
+
+	defaultSyncFolder string
 )
 
 func init() {
-	home := os.ExpandEnv("$HOME")
 	ip := readInfo()
 
 	BundleID = ip.BundleID
@@ -41,9 +45,22 @@ func init() {
 	Version = ip.Version
 	Name = ip.Name
 
-	CacheDir = filepath.Join(home, "Library/Caches/com.runningwithcrayons.Alfred-3/Workflow Data", ip.BundleID)
-	DataDir = filepath.Join(home, "Library/Application Support/Alfred 3/Workflow Data", ip.BundleID)
-	WorkflowDir = workflowDirectory()
+	PrefsFile = filepath.Join(Library, "Preferences/com.runningwithcrayons.Alfred-Preferences.plist")
+	if _, err := os.Stat(PrefsFile); err == nil {
+		CacheDir = filepath.Join(Library, "Caches/com.runningwithcrayons.Alfred/Workflow Data", ip.BundleID)
+		DataDir = filepath.Join(Library, "Application Support/Alfred/Workflow Data", ip.BundleID)
+		defaultSyncFolder = filepath.Join(Library, "Application Support/Alfred")
+
+	} else {
+		AppVersion = "3.8.1"
+		PrefsFile = filepath.Join(Library, "Preferences/com.runningwithcrayons.Alfred-Preferences-3.plist")
+		CacheDir = filepath.Join(Library, "Caches/com.runningwithcrayons.Alfred-3/Workflow Data", ip.BundleID)
+		DataDir = filepath.Join(Library, "Application Support/Alfred 3/Workflow Data", ip.BundleID)
+		defaultSyncFolder = filepath.Join(Library, "Application Support/Alfred 3")
+
+	}
+	SyncFolder = syncFolder()
+	WorkflowDir = filepath.Join(SyncFolder, "Alfred.alfredpreferences/workflows")
 }
 
 type infoPlist struct {
@@ -54,8 +71,13 @@ type infoPlist struct {
 
 func syncFolder() string {
 
-	data, err := ioutil.ReadFile(alfredPrefsPath)
-	if err != nil {
+	var (
+		dirs = []string{defaultSyncFolder}
+		data []byte
+		err  error
+	)
+
+	if data, err = ioutil.ReadFile(PrefsFile); err != nil {
 		panic(err)
 	}
 
@@ -63,31 +85,23 @@ func syncFolder() string {
 		SyncFolder string `plist:"syncfolder"`
 	}{}
 
-	if _, err := plist.Unmarshal(data, &p); err != nil {
+	if _, err = plist.Unmarshal(data, &p); err != nil {
 		panic(err)
 	}
 
-	return p.SyncFolder
-}
-
-func workflowDirectory() string {
-
-	dirs := []string{}
-
-	if p := syncFolder(); p != "" {
-		dirs = append(dirs, p)
+	if p.SyncFolder != "" {
+		dirs = append([]string{p.SyncFolder}, dirs...)
 	}
-	dirs = append(dirs, defaultSyncFolder)
 
 	for _, p := range dirs {
-		p = expandPath(filepath.Join(p, "Alfred.alfredpreferences/workflows"))
-		if _, err := os.Stat(p); err != nil {
-			fmt.Printf("read %q: %v\n", p, err)
-			continue
+		p = expandPath(p)
+		if exists(p) {
+
+			return p
 		}
-		return p
 	}
-	panic("workflow directory not found")
+
+	panic("syncfolder not found")
 }
 
 func readInfo() infoPlist {
@@ -111,6 +125,7 @@ func alfredEnv() map[string]string {
 		"alfred_workflow_name":     Name,
 		"alfred_workflow_cache":    CacheDir,
 		"alfred_workflow_data":     DataDir,
+		"alfred_version":           AppVersion,
 		"GO111MODULE":              "on", // for building
 	}
 }

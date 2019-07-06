@@ -45,6 +45,7 @@ func mod(args ...string) error {
 // Aliases are mage command aliases.
 var Aliases = map[string]interface{}{
 	"b": Build,
+	"c": Clean,
 	"d": Dist,
 	"l": Link,
 }
@@ -121,7 +122,7 @@ func Run() error {
 	return sh.RunWith(alfredEnv(), "./assh", "-h")
 }
 
-// Dist build an .alfred-workflow file in ./dist
+// Dist build an .alfredworkflow file in ./dist
 func Dist() error {
 	mg.SerialDeps(Clean, Build)
 	if err := os.MkdirAll("./dist", 0700); err != nil {
@@ -162,12 +163,24 @@ func Dist() error {
 			return nil
 		}
 
-		var name string
+		var (
+			name, orig string
+			info       os.FileInfo
+			mode       os.FileMode
+		)
 		if name, err = filepath.Rel("./build", path); err != nil {
 			return err
 		}
 
-		fmt.Printf("    %s (%v)\n", name, fi.Mode().Perm())
+		if orig, err = filepath.EvalSymlinks(path); err != nil {
+			return err
+		}
+		if info, err = os.Stat(orig); err != nil {
+			return err
+		}
+		mode = info.Mode()
+
+		fmt.Printf("%v  %s\n", mode, name)
 
 		var (
 			f  *os.File
@@ -180,9 +193,10 @@ func Dist() error {
 			Method: zip.Deflate,
 		}
 
-		fh.SetMode(fi.Mode().Perm())
+		// fh.SetModTime(fi.ModTime())
+		fh.SetMode(mode.Perm())
 
-		if f, err = os.Open(path); err != nil {
+		if f, err = os.Open(orig); err != nil {
 			return err
 		}
 		defer f.Close()
@@ -244,7 +258,7 @@ func Link() error {
 	mg.Deps(Build)
 
 	fmt.Println("linking ./build to workflow directory ...")
-	target := filepath.Join(workflowDirectory(), BundleID)
+	target := filepath.Join(WorkflowDir, BundleID)
 	// fmt.Printf("target: %s\n", target)
 
 	if exists(target) {
@@ -307,6 +321,13 @@ func Deps() error {
 	mg.Deps(cleanDeps)
 	fmt.Println("downloading deps ...")
 	return mod("download")
+}
+
+// Vendor copies dependencies to ./vendor
+func Vendor() error {
+	mg.Deps(Deps)
+	fmt.Println("vendoring deps ...")
+	return mod("vendor")
 }
 
 // Clean remove build files

@@ -2,8 +2,8 @@
 # Build artefacts
 /build
 /dist
+/vendor
 
 # Vim turds
 /tags
 *.swp
-

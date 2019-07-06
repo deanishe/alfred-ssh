@@ -11,11 +11,11 @@ Open SSH/SFTP/mosh connections from [Alfred 3][alfredapp] with autosuggestions b
 - [Installation](#installation)
 - [Usage](#usage)
 - [Configuration](#configuration)
-    - [Sources](#sources)
-    - [Advanced configuration](#advanced-configuration)
-        - [URLs](#urls)
-        - [Commands](#commands)
-        - [Using iTerm2](#using-iterm2)
+  - [Sources](#sources)
+  - [Advanced configuration](#advanced-configuration)
+    - [URLs](#urls)
+    - [Commands](#commands)
+    - [Using iTerm2](#using-iterm2)
 - [Licensing & thanks](#licensing--thanks)
 - [Changelog](#changelog)
 
@@ -159,6 +159,8 @@ If you need Alfred 2 support, check out [@isometry's workflow][ssh-breathe].
 Changelog
 ---------
 
+- **v0.9.0**
+    - 
 - **v0.8.0 — 2018-03-17**
     - Add option to use `ssh` command instead of URL.
         Enables loading of local shell configuration before opening connection. #8
@@ -187,11 +189,11 @@ Changelog
 [alfterm]: https://www.alfredapp.com/help/features/terminal/
 [awgo]: https://godoc.org/github.com/deanishe/awgo
 [confsheet]: https://www.alfredapp.com/help/workflows/advanced/variables/#environment
-[demo]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/assets/demo.gif "The workflow in action"
+[demo]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/demo.gif "The workflow in action"
 [gh-releases]: https://github.com/deanishe/alfred-ssh/releases/latest
 [isometry]: https://github.com/isometry
 [iterm-plugin]: https://github.com/stuartcryan/custom-iterm-applescripts-for-alfred/
-[iterm-screenshot]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/assets/iTerm2.png "Setting a handler in iTerm2 Preferences"
+[iterm-screenshot]: https://raw.githubusercontent.com/deanishe/alfred-ssh/master/iTerm2.png "Setting a handler in iTerm2 Preferences"
 [mit]: https://opensource.org/licenses/MIT
 [sil]: http://scripts.sil.org/OFL
 [ssh_config]: https://github.com/havoc-io/ssh_config

@@ -117,6 +117,8 @@ Options:
 )
 
 func init() {
+	aw.IconWarning = IconWarning
+
 	wf = aw.New(
 		aw.SortOptions(
 			fuzzy.SeparatorBonus(10.0),
@@ -226,7 +228,7 @@ func parseArgs() *options {
 		panic(fmt.Sprintf("Error parsing CLI options: %v", err))
 	}
 
-	if err = wf.Alfred.To(o); err != nil {
+	if err = wf.Config.To(o); err != nil {
 		panic(fmt.Sprintf("Error loading workflow configuration: %v", err))
 	}
 
@@ -279,8 +281,7 @@ func runPrint(o *options) {
 
 // Open a URL in the default or custom application.
 func runOpen(o *options) {
-
-	wf.TextErrors = true
+	wf.Configure(aw.TextErrors(true))
 
 	var (
 		argv     = []string{}
@@ -306,7 +307,7 @@ func runOpen(o *options) {
 
 // Check for an update to the workflow
 func runUpdate(o *options) {
-	wf.TextErrors = true
+	wf.Configure(aw.TextErrors(true))
 
 	if err := wf.CheckForUpdate(); err != nil {
 		wf.FatalError(err)
@@ -430,18 +431,17 @@ func runConfig(opts *options) {
 
 // Toggle a setting on/off
 func runToggle(o *options) {
-
 	wf.Configure(aw.TextErrors(true))
 
 	var s = "1"
 
-	if wf.Alfred.GetBool(o.VarName) {
+	if wf.Config.GetBool(o.VarName) {
 		s = "0"
 	}
 
 	log.Printf("[toggle] %s ->  %q", o.VarName, s)
 
-	if err := wf.Alfred.SetConfig(o.VarName, s, true).Do(); err != nil {
+	if err := wf.Config.Set(o.VarName, s, true).Do(); err != nil {
 		wf.FatalError(err)
 	}
 
@@ -546,10 +546,10 @@ func run() {
 	}
 
 	// Run update check
-	if wf.UpdateCheckDue() && !aw.IsRunning(updateJobName) {
+	if wf.UpdateCheckDue() && !wf.IsRunning(updateJobName) {
 		log.Println("Checking for update...")
 		cmd := exec.Command("./assh", "check")
-		if err := aw.RunInBackground(updateJobName, cmd); err != nil {
+		if err := wf.RunInBackground(updateJobName, cmd); err != nil {
 			log.Printf("Error running update check: %s", err)
 		}
 	}
