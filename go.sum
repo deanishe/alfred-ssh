@@ -2,6 +2,8 @@ github.com/bmatcuk/doublestar v1.1.1 h1:YroD6BJCZBYx06yYFEWvUuKVWQn3vLLQAVmDmvTS
 github.com/bmatcuk/doublestar v1.1.1/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
 github.com/bmatcuk/doublestar v1.1.2 h1:p0ybUUk/Dh+yetkg3v0Yhi/ujMiet/gztYQnxNXfsyw=
 github.com/bmatcuk/doublestar v1.1.2/go.mod h1:UD6OnuiIn0yFxxA2le/rnRU1G4RaI4UvFv1sNto9p6w=
+github.com/bmatcuk/doublestar v1.2.3 h1:ChLVAfc51TZWXjnbB/3ZKMbk78j0vs0WhtgeDS+L/+I=
+github.com/bmatcuk/doublestar v1.2.3/go.mod h1:wiQtGV+rzVYxB7WIlirSN++5HPtPlXEo9MEoZQC/PmE=
 github.com/deanishe/awgo v0.20.2 h1:2hQwGoMJz8/+1MIXEvE2PQqBDIfIdjJiHWvYbNbZ5gU=
 github.com/deanishe/awgo v0.20.2/go.mod h1:2cRIRY+pgEcNHNAXzRyrrIiCpSHpvebc5dyDzeH5bV8=
 github.com/disintegration/imaging v1.6.0 h1:nVPXRUUQ36Z7MNf0O77UzgnOb1mkMMor7lmJMJXc/mA=
