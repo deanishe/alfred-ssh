@@ -9,6 +9,6 @@ require (
 	github.com/magefile/mage v1.8.0
 	github.com/pkg/errors v0.8.1
 	golang.org/x/image v0.0.0-20190703141733-d6a02ce849c9 // indirect
-	golang.org/x/text v0.3.2
+	golang.org/x/text v0.3.3
 	howett.net/plist v0.0.0-20181124034731-591f970eefbb
 )
