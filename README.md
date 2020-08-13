@@ -131,8 +131,6 @@ If you'd prefer to use iTerm2 rather than Terminal.app, there are two steps:
 1. To have shell commands open in iTerm2, install [@stuartcryan][stuart]'s [iTerm2 plugin for Alfred][iterm-plugin].
 2. To open `ssh://...` URLs in iTerm2, Set iTerm2 as the default handler for `ssh:` URLs in iTerm2's own preferences under `Profiles > PROFILE_NAME > General > URL Schemes`:
 
-![iTerm2 > Preferences > PROFILE_NAME > General > URL Schemes](assets/iTerm2.png)
-
 ![iTerm2 > Preferences > PROFILE_NAME > General > URL Schemes](/assets/iTerm2.png "Secure SHell Demo")
 
 <a id="licensing--thanks"></a>
