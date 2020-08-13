@@ -3,8 +3,7 @@ Secure SHell for Alfred
 
 Open SSH/SFTP/mosh connections from [Alfred 3][alfredapp] with autosuggestions based on SSH config files, `/etc/hosts` and your history.
 
-![Secure SHell Demo](/assets/demo.gif)
-
+![Secure SHell Demo](/assets/demo.gif "Secure SHell Demo")
 
 <!-- MarkdownTOC autolink="true" bracket="round" levels="1,2,3,4" autoanchor="true" -->
 
@@ -134,6 +133,7 @@ If you'd prefer to use iTerm2 rather than Terminal.app, there are two steps:
 
 ![iTerm2 > Preferences > PROFILE_NAME > General > URL Schemes](assets/iTerm2.png)
 
+![iTerm2 > Preferences > PROFILE_NAME > General > URL Schemes](/assets/iTerm2.png "Secure SHell Demo")
 
 <a id="licensing--thanks"></a>
 Licensing & thanks
