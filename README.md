@@ -4,17 +4,21 @@ Open SSH/SFTP/mosh connections from [Alfred 3][alfredapp] with autosuggestions b
 
 ![demo](assets/demo.gif)
 
-- [Features](/#features)
-- [Installation](/#installation)
-- [Usage](/#usage)
-- [Configuration](/#configuration)
-    - [Sources](/#sources)
-    - [Advanced Configuration](/#advanced-configuration)
-        - [URLs](/#urls)
-        - [Commands](/#commands)
-        - [Using iTerm2](/#using-iterm2)
-    - [License & Thanks](/#license-and-thanks)
-    - [Changelog](/#changelog)
+<!-- MarkdownTOC autolink="true" bracket="round" levels="1,2,3,4" autoanchor="true" -->
+
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+    - [Sources](#sources)
+    - [Advanced Configuration](#advanced-configuration)
+        - [URLs](#urls)
+        - [Commands](#commands)
+        - [Using iTerm2](#using-iterm2)
+    - [License & Thanks](#license-and-thanks)
+    - [Changelog](#changelog)
+
+<!-- /MarkdownTOC -->
 
 ## <a id="features">Features</a>
 
