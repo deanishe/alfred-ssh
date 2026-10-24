@@ -32,7 +32,7 @@ Features
     - Open **SFTP** connection
     - **Ping** host
 - Sources (can be managed individually):
-    - `~/.ssh/config`
+    - `~/.ssh/config` (including files pulled in with `Include`)
     - `~/.ssh/known_hosts`
     - History (i.e. username + host addresses previously entered by the user)
     - `/etc/hosts`
@@ -159,7 +159,9 @@ Changelog
 ---------
 
 - **v0.9.0**
-    - 
+    - Universal binary: runs natively on Apple silicon and Intel, no Rosetta needed
+    - Follow `Include` directives in SSH config files #11
+    - Build with mage instead of shell scripts
 - **v0.8.0 — 2018-03-17**
     - Add option to use `ssh` command instead of URL.
         Enables loading of local shell configuration before opening connection. #8

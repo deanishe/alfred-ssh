@@ -1,6 +1,7 @@
 // Copyright (c) 2019 Dean Jackson <deanishe@deanishe.net>
 // MIT Licence applies http://opensource.org/licenses/MIT
 
+//go:build mage
 // +build mage
 
 package main
@@ -42,6 +43,32 @@ func mod(args ...string) error {
 	return sh.RunWith(alfredEnv(), "go", argv...)
 }
 
+// buildUniversal builds assh for Apple Silicon and Intel and merges the two
+// into one universal binary, so the workflow never depends on Rosetta.
+func buildUniversal(out string) error {
+	var slices []string
+	for _, arch := range []string{"arm64", "amd64"} {
+		env := alfredEnv()
+		env["GOOS"] = "darwin"
+		env["GOARCH"] = arch
+		env["CGO_ENABLED"] = "0"
+		slice := out + "_" + arch
+		if err := sh.RunWith(env, "go", "build", "-trimpath", "-o", slice, "./cmd/assh"); err != nil {
+			return err
+		}
+		slices = append(slices, slice)
+	}
+	if err := sh.Run("lipo", append([]string{"-create", "-output", out}, slices...)...); err != nil {
+		return err
+	}
+	for _, s := range slices {
+		if err := os.Remove(s); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Aliases are mage command aliases.
 var Aliases = map[string]interface{}{
 	"b": Build,
@@ -55,7 +82,7 @@ func Build() error {
 	mg.Deps(cleanBuild, Icons)
 	// mg.Deps(Deps)
 	fmt.Println("building ...")
-	if err := sh.RunWith(alfredEnv(), "go", "build", "-o", "./build/assh", "./cmd/assh"); err != nil {
+	if err := buildUniversal("./build/assh"); err != nil {
 		return err
 	}
 
@@ -258,7 +285,7 @@ func Link() error {
 	mg.Deps(Build)
 
 	fmt.Println("linking ./build to workflow directory ...")
-	target := filepath.Join(WorkflowDir, BundleID)
+	target := filepath.Join(workflowDir(), BundleID)
 	// fmt.Printf("target: %s\n", target)
 
 	if exists(target) {

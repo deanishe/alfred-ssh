@@ -1,6 +1,7 @@
 // Copyright (c) 2019 Dean Jackson <deanishe@deanishe.net>
 // MIT Licence applies http://opensource.org/licenses/MIT
 
+//go:build mage
 // +build mage
 
 package main
@@ -24,12 +25,10 @@ var (
 	Version  string
 	Name     string
 
-	PrefsFile   string
-	SyncFolder  string
-	DataDir     string
-	CacheDir    string
-	WorkflowDir string
-	AppVersion  string
+	PrefsFile  string
+	DataDir    string
+	CacheDir   string
+	AppVersion string
 
 	defaultSyncFolder string
 )
@@ -59,14 +58,18 @@ func init() {
 		defaultSyncFolder = filepath.Join(Library, "Application Support/Alfred 3")
 
 	}
-	SyncFolder = syncFolder()
-	WorkflowDir = filepath.Join(SyncFolder, "Alfred.alfredpreferences/workflows")
 }
 
 type infoPlist struct {
 	BundleID string `plist:"bundleid"`
 	Version  string `plist:"version"`
 	Name     string `plist:"name"`
+}
+
+// workflowDir is Alfred's workflow directory. Resolved on demand (not in init)
+// so targets other than Link run on machines without Alfred, such as CI.
+func workflowDir() string {
+	return filepath.Join(syncFolder(), "Alfred.alfredpreferences/workflows")
 }
 
 func syncFolder() string {

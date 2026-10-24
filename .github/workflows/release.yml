@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    # Apple silicon runner; lipo ships with Xcode.
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
+      - name: Install mage
+        run: |
+          go install github.com/magefile/mage@v1.17.2
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+      - name: Test
+        run: go test ./...
+      - name: Build universal workflow
+        run: mage dist
+      - name: Check binary is universal
+        run: lipo -archs build/assh | grep -qw arm64 && lipo -archs build/assh | grep -qw x86_64
+      - uses: actions/upload-artifact@v7
+        with:
+          name: workflow
+          path: dist/*.alfredworkflow
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*.alfredworkflow
+          fail_on_unmatched_files: true
+          generate_release_notes: true
